@@ -19,7 +19,7 @@ export default function DecisionCard({ decision }: DecisionCardProps) {
       default:
         return 'bg-gray-100 text-gray-800';
     }
-  };
+  }; 
 
   const getPriorityColor = (priority: Decision['priority']) => {
     switch (priority) {

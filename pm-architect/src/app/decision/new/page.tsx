@@ -1,1 +1,5 @@
-// TODO: Implement new decision form page 
+import DecisionForm from "@/components/DecisionForm";
+
+export default function NewDecisionPage() {
+  return <DecisionForm />;
+} 
