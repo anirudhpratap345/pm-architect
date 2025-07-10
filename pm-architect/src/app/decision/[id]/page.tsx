@@ -206,7 +206,6 @@ export default function DecisionDetailPage({ params }: DecisionDetailPageProps) 
         <h2 className="text-lg font-semibold mb-2">Timeline</h2>
         <ul className="text-gray-300">
           <li>Created: {formatDate(decision.createdAt.toISOString())}</li>
-          {decision.deadline && <li>Deadline: {formatDate(decision.deadline)}</li>}
         </ul>
       </div>
 
