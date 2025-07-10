@@ -27,11 +27,20 @@ const staticComments = [
   }
 ];
 
+const STATUS_OPTIONS = [
+  { value: "pending", label: "Pending" },
+  { value: "open", label: "Open" },
+  { value: "resolved", label: "Resolved" },
+];
+
 export default function DecisionDetailPage({ params }: DecisionDetailPageProps) {
   const { id } = use(params);
   const decision = mockDecisions.find((d) => d.id === id);
   if (!decision) return notFound();
 
+  // Local status state
+  const [status, setStatus] = useState<Decision["status"]>(decision.status);
+  const [statusUpdated, setStatusUpdated] = useState(false);
   // Comment form state
   const [comment, setComment] = useState("");
   function handleCommentSubmit(e: React.FormEvent) {
@@ -41,6 +50,11 @@ export default function DecisionDetailPage({ params }: DecisionDetailPageProps) 
       console.log({ comment });
       setComment("");
     }
+  }
+  function handleStatusChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    setStatus(e.target.value as Decision["status"]);
+    setStatusUpdated(true);
+    setTimeout(() => setStatusUpdated(false), 2000);
   }
 
   return (
@@ -56,10 +70,25 @@ export default function DecisionDetailPage({ params }: DecisionDetailPageProps) 
         </Link>
       </div>
       <p className="text-sm text-gray-500 mb-2">{formatDate(decision.createdAt)}</p>
-      {/* Status Badge */}
-      <span className="inline-block px-3 py-1 rounded bg-blue-100 text-blue-700 text-sm font-medium mb-4">
-        {decision.status}
-      </span>
+      {/* Status Badge and Dropdown */}
+      <div className="flex items-center mb-4 gap-2 flex-wrap">
+        <span className="inline-block px-3 py-1 rounded bg-blue-100 text-blue-700 text-sm font-medium">
+          {status.charAt(0).toUpperCase() + status.slice(1)}
+        </span>
+        <select
+          value={status}
+          onChange={handleStatusChange}
+          className="border border-gray-300 rounded px-2 py-1 text-sm ml-2 bg-[#18181b] text-white focus:outline-none focus:ring-2 focus:ring-sky-500"
+        >
+          {STATUS_OPTIONS.map((opt) => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          ))}
+        </select>
+        {statusUpdated && (
+          <p className="text-green-600 text-sm ml-2">✅ Status updated to {status.charAt(0).toUpperCase() + status.slice(1)}</p>
+        )}
+      </div>
+      <p className="text-xs text-gray-400 mt-1 mb-2">Last updated: {formatDate(new Date().toISOString())}</p>
 
       {/* Context/Description */}
       <div className="border-t pt-6 mt-6">
@@ -203,14 +232,19 @@ export default function DecisionDetailPage({ params }: DecisionDetailPageProps) 
             placeholder="Add a comment..."
             value={comment}
             onChange={e => setComment(e.target.value)}
+            disabled={status === "resolved"}
           />
           <button
             type="submit"
-            className="self-end bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded font-semibold text-sm transition"
+            className="self-end bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded font-semibold text-sm transition disabled:opacity-50"
+            disabled={status === "resolved"}
           >
             Post Comment
           </button>
         </form>
+        {status === "resolved" && (
+          <p className="text-xs text-gray-400 mt-2">Comments are disabled for resolved decisions.</p>
+        )}
       </div>
     </main>
   );

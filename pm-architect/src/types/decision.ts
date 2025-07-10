@@ -5,11 +5,12 @@ export interface Decision {
   options: DecisionOption[];
   tradeoffs: Tradeoff[];
   constraints: string[];
-  status: 'pending' | 'in-progress' | 'completed' | 'archived';
+  status: 'pending' | 'in-progress' | 'completed' | 'archived' | 'open' | 'resolved';
   createdAt: Date;
   updatedAt: Date;
   priority: 'low' | 'medium' | 'high' | 'critical';
   category: 'architecture' | 'model-selection' | 'infrastructure' | 'feature-priority' | 'technology-stack';
+  tags: string[];
 }
 
 export interface DecisionOption {

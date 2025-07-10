@@ -48,7 +48,8 @@ export const mockDecisions: Decision[] = [
     createdAt: new Date('2024-01-15'),
     updatedAt: new Date('2024-01-20'),
     priority: 'high',
-    category: 'model-selection'
+    category: 'model-selection',
+    tags: ['Transformer', 'DeepFM', 'Latency-sensitive', 'Cost-sensitive'],
   },
   {
     id: '2',
@@ -97,7 +98,8 @@ export const mockDecisions: Decision[] = [
     createdAt: new Date('2024-01-10'),
     updatedAt: new Date('2024-01-18'),
     priority: 'critical',
-    category: 'infrastructure'
+    category: 'infrastructure',
+    tags: ['ClickHouse', 'PostgreSQL', 'Cost-sensitive', 'Analytics'],
   },
   {
     id: '3',
@@ -146,7 +148,8 @@ export const mockDecisions: Decision[] = [
     createdAt: new Date('2023-12-01'),
     updatedAt: new Date('2024-01-15'),
     priority: 'medium',
-    category: 'architecture'
+    category: 'architecture',
+    tags: ['Microservices', 'Monolith', 'Latency-sensitive', 'Architecture'],
   },
   {
     id: '4',
@@ -195,6 +198,7 @@ export const mockDecisions: Decision[] = [
     createdAt: new Date('2024-01-05'),
     updatedAt: new Date('2024-01-12'),
     priority: 'high',
-    category: 'feature-priority'
+    category: 'feature-priority',
+    tags: ['AI Assistant', 'Analytics', 'Explainability'],
   }
 ]; 
