@@ -69,7 +69,7 @@ export default function DecisionDetailPage({ params }: DecisionDetailPageProps) 
           Edit
         </Link>
       </div>
-      <p className="text-sm text-gray-500 mb-2">{formatDate(decision.createdAt)}</p>
+      <p className="text-sm text-gray-500 mb-2">{formatDate(decision.createdAt.toISOString())}</p>
       {/* Status Badge and Dropdown */}
       <div className="flex items-center mb-4 gap-2 flex-wrap">
         <span className="inline-block px-3 py-1 rounded bg-blue-100 text-blue-700 text-sm font-medium">
@@ -205,7 +205,7 @@ export default function DecisionDetailPage({ params }: DecisionDetailPageProps) 
       <div className="border-t pt-6 mt-6">
         <h2 className="text-lg font-semibold mb-2">Timeline</h2>
         <ul className="text-gray-300">
-          <li>Created: {formatDate(decision.createdAt)}</li>
+          <li>Created: {formatDate(decision.createdAt.toISOString())}</li>
           {decision.deadline && <li>Deadline: {formatDate(decision.deadline)}</li>}
         </ul>
       </div>

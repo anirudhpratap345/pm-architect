@@ -24,7 +24,16 @@ type DecisionFormData = {
   deadline: string;
 };
 
-export default function DecisionForm() {
+type NormalizedDecisionFormData = Omit<DecisionFormData, "options" | "stakeholders"> & {
+  options: string[];
+  stakeholders: string[];
+};
+
+interface DecisionFormProps {
+  onSubmit?: (data: NormalizedDecisionFormData) => void;
+}
+
+export default function DecisionForm({ onSubmit }: DecisionFormProps) {
   const [form, setForm] = useState<DecisionFormData>({
     title: "",
     description: "",
@@ -53,11 +62,16 @@ export default function DecisionForm() {
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    console.log({
+    const normalized = {
       ...form,
       options: form.options.split(",").map((s) => s.trim()).filter(Boolean),
       stakeholders: form.stakeholders.split(",").map((s) => s.trim()).filter(Boolean),
-    });
+    };
+    if (onSubmit) {
+      onSubmit(normalized);
+    } else {
+      console.log(normalized);
+    }
   }
 
   return (
