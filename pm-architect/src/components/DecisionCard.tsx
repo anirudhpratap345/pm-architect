@@ -20,7 +20,7 @@ const STATUS_COLORS: Record<string, string> = {
   "archived": "bg-gray-200 text-gray-700",
   "open": "bg-blue-100 text-blue-700",
   "resolved": "bg-green-100 text-green-700",
-};
+  }; 
 
 const PRIORITY_COLORS: Record<string, string> = {
   "low": "bg-gray-100 text-gray-600",
@@ -50,13 +50,13 @@ export default function DecisionCard({ decision }: { decision: Decision }) {
         <span>Updated {formatDate(typeof decision.updatedAt === 'string' ? decision.updatedAt : decision.updatedAt.toISOString())}</span>
         <span>{decision.options?.length || 0} options</span>
         <span>{decision.tradeoffs?.length || 0} tradeoffs</span>
-      </div>
+            </div>
       {/* Description */}
       <div className="text-gray-200 text-sm mb-2 line-clamp-3">{decision.context}</div>
       {/* Constraints */}
       <div className="text-xs text-gray-400 mb-2">
         <span className="font-medium text-gray-500">Constraints:</span> {decision.constraints?.length || 0} constraint{decision.constraints?.length === 1 ? '' : 's'}
-      </div>
+          </div>
       {/* Tags */}
       {decision.tags && decision.tags.length > 0 && (
         <div className="flex flex-wrap gap-2 mt-2">
@@ -65,8 +65,8 @@ export default function DecisionCard({ decision }: { decision: Decision }) {
               {tag}
             </span>
           ))}
-        </div>
-      )}
+          </div>
+        )}
       {/* Right Arrow Icon */}
       <div className="flex justify-end mt-2">
         <span className="text-sky-500 text-xl group-hover:translate-x-1 transition-transform">→</span>

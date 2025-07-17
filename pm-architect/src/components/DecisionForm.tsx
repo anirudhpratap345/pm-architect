@@ -46,7 +46,7 @@ export default function DecisionForm({ onSubmit }: DecisionFormProps) {
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    setForm((prev) => ({ ...prev, [name]: value })); 
   }
 
   function handleCheckboxChange(e: React.ChangeEvent<HTMLInputElement>, group: "constraints" | "metrics") {
