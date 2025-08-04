@@ -5,27 +5,11 @@ import { formatDate } from "@/lib/utils";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { use, useState } from "react";
+import Comments from "@/components/Comments";
 
 interface DecisionDetailPageProps {
   params: Promise<{ id: string }>;
 }
-
-const staticComments = [
-  {
-    id: 1,
-    name: "Alex Johnson",
-    avatar: "https://randomuser.me/api/portraits/men/32.jpg",
-    date: "2024-02-01",
-    text: "Great breakdown of the tradeoffs! I think the risk is worth it for the performance gains."
-  },
-  {
-    id: 2,
-    name: "Priya Patel",
-    avatar: "https://randomuser.me/api/portraits/women/44.jpg",
-    date: "2024-02-02",
-    text: "Can we get more details on the cost estimates for the Transformer option?"
-  }
-];
 
 const STATUS_OPTIONS = [
   { value: "pending", label: "Pending" },
@@ -41,16 +25,7 @@ export default function DecisionDetailPage({ params }: DecisionDetailPageProps) 
   // Local status state
   const [status, setStatus] = useState<Decision["status"]>(decision.status);
   const [statusUpdated, setStatusUpdated] = useState(false);
-  // Comment form state
-  const [comment, setComment] = useState("");
-  function handleCommentSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (comment.trim()) {
-      // In real app, submit to backend
-      console.log({ comment });
-      setComment("");
-    }
-  }
+  
   function handleStatusChange(e: React.ChangeEvent<HTMLSelectElement>) {
     setStatus(e.target.value as Decision["status"]);
     setStatusUpdated(true);
@@ -211,39 +186,7 @@ export default function DecisionDetailPage({ params }: DecisionDetailPageProps) 
 
       {/* Comments Section */}
       <div className="border-t pt-6 mt-6">
-        <h2 className="text-lg font-semibold mb-2">Comments</h2>
-        <div className="flex flex-col gap-4 mb-4">
-          {staticComments.map((c) => (
-            <div key={c.id} className="flex items-start gap-3">
-              <img src={c.avatar} alt={c.name} className="w-10 h-10 rounded-full border-2 border-sky-500" />
-              <div>
-                <div className="font-semibold text-white text-sm">{c.name}</div>
-                <div className="text-xs text-gray-400 mb-1">{formatDate(c.date)}</div>
-                <div className="text-gray-200 text-sm">{c.text}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-        <form onSubmit={handleCommentSubmit} className="flex flex-col gap-2">
-          <textarea
-            className="w-full rounded border border-gray-700 bg-[#18181b] text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-sky-500"
-            rows={3}
-            placeholder="Add a comment..."
-            value={comment}
-            onChange={e => setComment(e.target.value)}
-            disabled={status === "resolved"}
-          />
-          <button
-            type="submit"
-            className="self-end bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded font-semibold text-sm transition disabled:opacity-50"
-            disabled={status === "resolved"}
-          >
-            Post Comment
-          </button>
-        </form>
-        {status === "resolved" && (
-          <p className="text-xs text-gray-400 mt-2">Comments are disabled for resolved decisions.</p>
-        )}
+        <Comments decisionId={decision.id} />
       </div>
     </main>
   );

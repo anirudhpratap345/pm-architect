@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useSession, signIn, signOut } from "next-auth/react";
+import Notifications from "./Notifications";
 
 export default function Header() {
   const { data: session } = useSession();
@@ -26,6 +27,7 @@ export default function Header() {
           {/* Auth */}
           {session ? (
             <div className="flex items-center gap-2 ml-4">
+              <Notifications />
               {session.user?.image && (
                 <img src={session.user.image} alt="avatar" className="w-8 h-8 rounded-full border-2 border-sky-500" />
               )}
