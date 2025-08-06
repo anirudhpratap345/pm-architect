@@ -9,7 +9,6 @@ export interface Decision {
   createdAt: Date;
   updatedAt: Date;
   priority: 'low' | 'medium' | 'high' | 'critical';
-  category: 'architecture' | 'model-selection' | 'infrastructure' | 'feature-priority' | 'technology-stack';
   tags: string[];
 }
 
