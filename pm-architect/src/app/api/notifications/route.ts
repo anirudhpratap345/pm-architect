@@ -5,29 +5,18 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-// GET /api/notifications
-export async function GET(request: NextRequest) {
+// GET /api/notifications - Get user's notifications
+export async function GET() {
   try {
     const session = await getServerSession(authOptions);
+    
     if (!session?.user?.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-    });
-
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
-
-    const { searchParams } = new URL(request.url);
-    const unreadOnly = searchParams.get('unread') === 'true';
-
     const notifications = await prisma.notification.findMany({
       where: {
-        userId: user.id,
-        ...(unreadOnly && { read: false }),
+        userId: session.user.email,
       },
       include: {
         decision: {
@@ -40,7 +29,7 @@ export async function GET(request: NextRequest) {
       orderBy: {
         createdAt: 'desc',
       },
-      take: 50, // Limit to last 50 notifications
+      take: 50, // Limit to 50 most recent notifications
     });
 
     return NextResponse.json(notifications);
@@ -53,10 +42,11 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// PATCH /api/notifications
+// PATCH /api/notifications - Mark notifications as read
 export async function PATCH(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
+    
     if (!session?.user?.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -64,43 +54,47 @@ export async function PATCH(request: NextRequest) {
     const body = await request.json();
     const { notificationId, markAllAsRead } = body;
 
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-    });
-
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
-
     if (markAllAsRead) {
       // Mark all notifications as read
       await prisma.notification.updateMany({
         where: {
-          userId: user.id,
+          userId: session.user.email,
           read: false,
         },
         data: {
           read: true,
         },
       });
-    } else if (notificationId) {
-      // Mark specific notification as read
-      await prisma.notification.update({
-        where: {
-          id: notificationId,
-          userId: user.id, // Ensure user owns the notification
-        },
-        data: {
-          read: true,
-        },
-      });
+
+      return NextResponse.json({ message: 'All notifications marked as read' });
     }
 
-    return NextResponse.json({ success: true });
+    if (notificationId) {
+      // Mark specific notification as read
+      const notification = await prisma.notification.findFirst({
+        where: {
+          id: notificationId,
+          userId: session.user.email,
+        },
+      });
+
+      if (!notification) {
+        return NextResponse.json({ error: 'Notification not found' }, { status: 404 });
+      }
+
+      await prisma.notification.update({
+        where: { id: notificationId },
+        data: { read: true },
+      });
+
+      return NextResponse.json({ message: 'Notification marked as read' });
+    }
+
+    return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
   } catch (error) {
-    console.error('Error updating notifications:', error);
+    console.error('Error updating notification:', error);
     return NextResponse.json(
-      { error: 'Failed to update notifications' },
+      { error: 'Failed to update notification' },
       { status: 500 }
     );
   }

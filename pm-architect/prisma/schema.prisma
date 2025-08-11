@@ -1,3 +1,6 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,14 +13,19 @@ datasource db {
 model User {
   id            String         @id @default(cuid())
   name          String?
-  email         String?        @unique
+  email         String         @unique
   emailVerified DateTime?
   image         String?
   accounts      Account[]
-  comments      Comment[]
-  decisions     Decision[]
-  notifications Notification[]
   sessions      Session[]
+  decisions     Decision[]
+  comments      Comment[]
+  notifications Notification[]
+  teams         TeamMember[]
+  ownedTeams    Team[]         @relation("TeamOwner")
+  templates     DecisionTemplate[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
 }
 
 model Account {
@@ -26,14 +34,17 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String?
-  access_token      String?
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String?
+  id_token          String? @db.Text
   session_state     String?
-  user              User    @relation(fields: [userId], references: [id])
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
 }
 
 model Session {
@@ -41,7 +52,7 @@ model Session {
   sessionToken String   @unique
   userId       String
   expires      DateTime
-  user         User     @relation(fields: [userId], references: [id])
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model VerificationToken {
@@ -71,18 +82,26 @@ model Decision {
   comments      Comment[]
   user          User           @relation(fields: [createdBy], references: [id])
   notifications Notification[]
+  team          Team?          @relation(fields: [teamId], references: [id])
+  teamId        String?
+  sharedWith    DecisionShare[]
+  template      DecisionTemplate? @relation(fields: [templateId], references: [id])
+  templateId    String?
 }
 
 model Comment {
   id         String   @id @default(cuid())
+  content    String
   decisionId String
   userId     String
-  content    String
-  createdAt  DateTime @default(now())
   parentId   String?
   mentions   String[]
-  decision   Decision @relation(fields: [decisionId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  decision   Decision @relation(fields: [decisionId], references: [id], onDelete: Cascade)
   user       User     @relation(fields: [userId], references: [id])
+  parent     Comment? @relation("CommentReplies", fields: [parentId], references: [id])
+  replies    Comment[] @relation("CommentReplies")
 }
 
 model Notification {
@@ -94,6 +113,67 @@ model Notification {
   message    String
   read       Boolean  @default(false)
   createdAt  DateTime @default(now())
-  decision   Decision @relation(fields: [decisionId], references: [id])
   user       User     @relation(fields: [userId], references: [id])
+  decision   Decision @relation(fields: [decisionId], references: [id])
+}
+
+model Team {
+  id          String       @id @default(cuid())
+  name        String
+  description String?
+  ownerId     String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  owner       User         @relation("TeamOwner", fields: [ownerId], references: [id])
+  members     TeamMember[]
+  decisions   Decision[]
+}
+
+model TeamMember {
+  id       String   @id @default(cuid())
+  teamId   String
+  userId   String
+  role     String   @default("member") // owner, admin, member
+  joinedAt DateTime @default(now())
+  team     Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, userId])
+}
+
+model DecisionShare {
+  id         String   @id @default(cuid())
+  decisionId String
+  userId     String
+  permission String   @default("view") // view, edit, comment
+  createdAt  DateTime @default(now())
+  decision   Decision @relation(fields: [decisionId], references: [id], onDelete: Cascade)
+  
+  @@unique([decisionId, userId])
+}
+
+model DecisionTemplate {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  framework   String   // e.g., "SWOT Analysis", "Decision Matrix", "Cost-Benefit Analysis"
+  steps       String[] // Step-by-step process
+  questions   String[] // Key questions to consider
+  isPublic    Boolean  @default(false)
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdByUser User   @relation(fields: [createdBy], references: [id])
+  decisions   Decision[]
+  usages      TemplateUsage[]
+}
+
+model TemplateUsage {
+  id         String   @id @default(cuid())
+  templateId String
+  decisionId String
+  usedAt     DateTime @default(now())
+  template   DecisionTemplate @relation(fields: [templateId], references: [id])
+  
+  @@unique([templateId, decisionId])
 }
