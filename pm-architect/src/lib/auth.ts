@@ -13,12 +13,12 @@ const requiredEnvVars = {
   NEXTAUTH_URL: process.env.NEXTAUTH_URL,
 };
 
-// Check for missing environment variables
+// Check for missing environment variables (only warn during runtime, not build)
 const missingVars = Object.entries(requiredEnvVars)
   .filter(([_, value]) => !value)
   .map(([key, _]) => key);
 
-if (missingVars.length > 0) {
+if (missingVars.length > 0 && process.env.NODE_ENV !== 'production') {
   console.warn(`Missing environment variables: ${missingVars.join(', ')}`);
 }
 
