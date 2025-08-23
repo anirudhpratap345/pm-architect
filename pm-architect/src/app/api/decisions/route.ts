@@ -103,8 +103,8 @@ export async function POST(request: NextRequest) {
     const decision = await prisma.decision.create({
       data: {
         title: body.title,
-        description: body.context,
-        context: body.context,
+        description: body.description || body.context,
+        context: body.context || body.description,
         status: body.status || 'open',
         priority: body.priority || 'medium',
         options: body.options || [],
@@ -114,11 +114,6 @@ export async function POST(request: NextRequest) {
         tags: body.tags || [],
         deadline: body.deadline ? new Date(body.deadline) : null,
         createdBy: session.user.email,
-        user: {
-          connect: {
-            email: session.user.email,
-          },
-        },
       },
       include: {
         user: {

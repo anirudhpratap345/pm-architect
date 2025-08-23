@@ -22,6 +22,7 @@ export default function DecisionNewPage() {
       // Create the decision in the database
       const response = await decisionsApi.create({
         title: formData.title,
+        description: formData.description,
         context: formData.description,
         options: formData.options,
         constraints: formData.constraints,
@@ -29,7 +30,7 @@ export default function DecisionNewPage() {
         stakeholders: formData.stakeholders,
         deadline: formData.deadline || null,
         tags: [], // You can add tag selection later
-        priority: 'medium', // Default priority
+        priority: formData.priority || 'medium',
       });
 
       if (response.error) {

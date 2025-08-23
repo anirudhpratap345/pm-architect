@@ -22,9 +22,9 @@ interface AnalyticsData {
     critical: number;
   };
   statusDistribution: {
+    pending: number;
     open: number;
-    inProgress: number;
-    closed: number;
+    resolved: number;
   };
 }
 
@@ -38,7 +38,7 @@ export default function DashboardAnalytics({ decisions }: DashboardAnalyticsProp
     decisionsThisMonth: 0,
     averageDecisionAge: 0,
     priorityDistribution: { low: 0, medium: 0, high: 0, critical: 0 },
-    statusDistribution: { open: 0, inProgress: 0, closed: 0 },
+    statusDistribution: { pending: 0, open: 0, resolved: 0 },
   });
 
   useEffect(() => {
@@ -54,7 +54,7 @@ export default function DashboardAnalytics({ decisions }: DashboardAnalyticsProp
 
     const totalDecisions = decisions.length;
     const openDecisions = decisions.filter(d => d.status === 'open').length;
-    const closedDecisions = decisions.filter(d => d.status === 'closed').length;
+    const resolvedDecisions = decisions.filter(d => d.status === 'resolved').length;
     const highPriorityDecisions = decisions.filter(d => d.priority === 'high' || d.priority === 'critical').length;
     
     const decisionsThisWeek = decisions.filter(d => new Date(d.createdAt) >= oneWeekAgo).length;
@@ -77,15 +77,15 @@ export default function DashboardAnalytics({ decisions }: DashboardAnalyticsProp
 
     // Status distribution
     const statusDistribution = {
+      pending: decisions.filter(d => d.status === 'pending').length,
       open: decisions.filter(d => d.status === 'open').length,
-      inProgress: decisions.filter(d => d.status === 'in-progress').length,
-      closed: decisions.filter(d => d.status === 'closed').length,
+      resolved: decisions.filter(d => d.status === 'resolved').length,
     };
 
     setAnalytics({
       totalDecisions,
       openDecisions,
-      closedDecisions,
+      closedDecisions: resolvedDecisions,
       highPriorityDecisions,
       decisionsThisWeek,
       decisionsThisMonth,
@@ -108,8 +108,8 @@ export default function DashboardAnalytics({ decisions }: DashboardAnalyticsProp
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'open': return 'text-green-600 bg-green-100';
-      case 'in-progress': return 'text-yellow-600 bg-yellow-100';
-      case 'closed': return 'text-gray-600 bg-gray-100';
+      case 'pending': return 'text-yellow-600 bg-yellow-100';
+      case 'resolved': return 'text-gray-600 bg-gray-100';
       default: return 'text-gray-600 bg-gray-100';
     }
   };
@@ -224,7 +224,7 @@ export default function DashboardAnalytics({ decisions }: DashboardAnalyticsProp
                     <div
                       className={`h-2 rounded-full ${
                         status === 'open' ? 'bg-green-500' :
-                        status === 'in-progress' ? 'bg-yellow-500' : 'bg-gray-500'
+                        status === 'pending' ? 'bg-yellow-500' : 'bg-gray-500'
                       }`}
                       style={{ width: `${(count / analytics.totalDecisions) * 100}%` }}
                     />

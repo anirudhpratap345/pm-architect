@@ -14,7 +14,7 @@ export default function ProfilePage() {
   const [stats, setStats] = useState({
     total: 0,
     open: 0,
-    closed: 0,
+    resolved: 0,
     highPriority: 0,
   });
 
@@ -40,10 +40,10 @@ export default function ProfilePage() {
         // Calculate statistics
         const total = response.data.length;
         const open = response.data.filter(d => d.status === 'open').length;
-        const closed = response.data.filter(d => d.status === 'closed').length;
+        const resolved = response.data.filter(d => d.status === 'resolved').length;
         const highPriority = response.data.filter(d => d.priority === 'high' || d.priority === 'critical').length;
         
-        setStats({ total, open, closed, highPriority });
+        setStats({ total, open, resolved, highPriority });
       }
     } catch (error) {
       console.error("Failed to load user data:", error);
@@ -123,8 +123,8 @@ export default function ProfilePage() {
                 </svg>
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Closed Decisions</p>
-                <p className="text-2xl font-semibold text-gray-900">{stats.closed}</p>
+                <p className="text-sm font-medium text-gray-600">Resolved Decisions</p>
+                <p className="text-2xl font-semibold text-gray-900">{stats.resolved}</p>
               </div>
             </div>
           </div>
@@ -174,11 +174,11 @@ export default function ProfilePage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="text-lg font-medium text-gray-900">{decision.title}</h3>
-                      <p className="text-sm text-gray-600">{decision.description}</p>
+                      <p className="text-sm text-gray-600">{decision.context}</p>
                       <div className="flex items-center space-x-2 mt-2">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           decision.status === 'open' ? 'bg-green-100 text-green-800' :
-                          decision.status === 'closed' ? 'bg-gray-100 text-gray-800' :
+                          decision.status === 'resolved' ? 'bg-gray-100 text-gray-800' :
                           'bg-yellow-100 text-yellow-800'
                         }`}>
                           {decision.status}

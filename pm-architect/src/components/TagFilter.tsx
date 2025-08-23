@@ -2,7 +2,8 @@
 
 interface TagFilterProps {
   selectedTags: string[];
-  setSelectedTags: (tags: string[]) => void;
+  onTagsChange: (tags: string[]) => void;
+  availableTags: string[];
 }
 
 const TAGS = [
@@ -22,18 +23,21 @@ const TAGS = [
   "PostgreSQL"
 ];
 
-export default function TagFilter({ selectedTags, setSelectedTags }: TagFilterProps) {
+export default function TagFilter({ selectedTags, onTagsChange, availableTags }: TagFilterProps) {
   function toggleTag(tag: string) {
-    setSelectedTags(
+    onTagsChange(
       selectedTags.includes(tag)
         ? selectedTags.filter((t) => t !== tag)
         : [...selectedTags, tag]
     );
   }
 
+  // Use available tags if provided, otherwise fall back to default tags
+  const displayTags = availableTags.length > 0 ? availableTags : TAGS;
+
   return (
     <div className="flex flex-wrap gap-2 mb-6">
-      {TAGS.map((tag) => (
+      {displayTags.map((tag) => (
         <button
           key={tag}
           type="button"

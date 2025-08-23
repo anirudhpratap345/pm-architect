@@ -5,25 +5,39 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-// GET /api/decision/[id]/comments
+// GET /api/decision/[id]/comments - Get comments for a decision
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
+    
     if (!session?.user?.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const { id } = await params;
+
+    // Check if decision exists and user has access
+    const decision = await prisma.decision.findFirst({
+      where: {
+        id,
+        createdBy: session.user.email,
+      },
+    });
+
+    if (!decision) {
+      return NextResponse.json({ error: 'Decision not found' }, { status: 404 });
+    }
+
     const comments = await prisma.comment.findMany({
       where: {
-        decisionId: params.id,
+        decisionId: id,
       },
       include: {
         user: {
           select: {
-            id: true,
             name: true,
             email: true,
             image: true,
@@ -31,7 +45,7 @@ export async function GET(
         },
       },
       orderBy: {
-        createdAt: 'asc',
+        createdAt: 'desc',
       },
     });
 
@@ -45,57 +59,53 @@ export async function GET(
   }
 }
 
-// POST /api/decision/[id]/comments
+// POST /api/decision/[id]/comments - Create comment for a decision
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
+    
     if (!session?.user?.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const { id } = await params;
     const body = await request.json();
-    const { content, parentId, mentions } = body;
 
-    if (!content || content.trim().length === 0) {
+    // Validate required fields
+    if (!body.content) {
       return NextResponse.json(
         { error: 'Comment content is required' },
         { status: 400 }
       );
     }
 
-    // Get user by email
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-    });
-
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
-
-    // Verify decision exists
-    const decision = await prisma.decision.findUnique({
-      where: { id: params.id },
+    // Check if decision exists and user has access
+    const decision = await prisma.decision.findFirst({
+      where: {
+        id,
+        createdBy: session.user.email,
+      },
     });
 
     if (!decision) {
       return NextResponse.json({ error: 'Decision not found' }, { status: 404 });
     }
 
+    // Create the comment
     const comment = await prisma.comment.create({
       data: {
-        decisionId: params.id,
-        userId: user.id,
-        content: content.trim(),
-        parentId: parentId || null,
-        mentions: mentions || [],
+        content: body.content,
+        parentId: body.parentId || null,
+        mentions: body.mentions || [],
+        decisionId: id,
+        userId: session.user.email,
       },
       include: {
         user: {
           select: {
-            id: true,
             name: true,
             email: true,
             image: true,
@@ -105,23 +115,17 @@ export async function POST(
     });
 
     // Create notifications for mentioned users
-    if (mentions && mentions.length > 0) {
-      for (const mention of mentions) {
-        const mentionedUser = await prisma.user.findUnique({
-          where: { email: mention },
+    if (body.mentions && body.mentions.length > 0) {
+      for (const mention of body.mentions) {
+        await prisma.notification.create({
+          data: {
+            userId: mention,
+            decisionId: id,
+            type: 'mention',
+            title: 'You were mentioned in a comment',
+            message: `${session.user.name || session.user.email} mentioned you in a comment on "${decision.title}"`,
+          },
         });
-
-        if (mentionedUser && mentionedUser.id !== user.id) {
-          await prisma.notification.create({
-            data: {
-              userId: mentionedUser.id,
-              decisionId: params.id,
-              type: 'mention',
-              title: 'You were mentioned in a comment',
-              message: `${user.name || user.email} mentioned you in a comment on "${decision.title}"`,
-            },
-          });
-        }
       }
     }
 

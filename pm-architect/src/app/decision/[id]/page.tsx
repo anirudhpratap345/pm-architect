@@ -273,47 +273,6 @@ export default function DecisionDetailPage({ params }: DecisionDetailPageProps) 
         </div>
       )}
 
-      {/* Tradeoffs */}
-      {decision.tradeoffs && decision.tradeoffs.length > 0 && (
-        <div className="border-t pt-6 mt-6">
-          <h2 className="text-lg font-semibold mb-2">Tradeoffs</h2>
-          <div className="flex flex-col gap-4">
-            {decision.tradeoffs.map((t: any, index: number) => (
-              <div key={index} className="bg-[#18181b] rounded-xl p-4 shadow flex flex-col md:flex-row md:items-center gap-4">
-                <div className="flex-1">
-                  <div className="font-semibold text-white text-base mb-1">{t.title}</div>
-                  <div className="text-gray-300 text-sm mb-1">{t.description}</div>
-                </div>
-                <div className="flex flex-col gap-2 min-w-[120px]">
-                  {t.impact && (
-                    <span className={`inline-block px-3 py-1 rounded text-xs font-medium ${
-                      t.impact === "positive"
-                        ? "bg-green-900 text-green-200"
-                        : t.impact === "negative"
-                        ? "bg-red-900 text-red-200"
-                        : "bg-gray-800 text-gray-200"
-                    }`}>
-                      Impact: {t.impact.charAt(0).toUpperCase() + t.impact.slice(1)}
-                    </span>
-                  )}
-                  {t.magnitude && (
-                    <span className={`inline-block px-3 py-1 rounded text-xs font-medium ${
-                      t.magnitude === "high"
-                        ? "bg-sky-900 text-sky-200"
-                        : t.magnitude === "medium"
-                        ? "bg-yellow-900 text-yellow-200"
-                        : "bg-gray-800 text-gray-200"
-                    }`}>
-                      Magnitude: {t.magnitude.charAt(0).toUpperCase() + t.magnitude.slice(1)}
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* Timeline */}
       <div className="border-t pt-6 mt-6">
         <h2 className="text-lg font-semibold mb-2">Timeline</h2>

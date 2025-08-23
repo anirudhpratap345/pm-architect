@@ -35,6 +35,13 @@ export async function POST(
         userId: session.user.email,
         role: { in: ['owner', 'admin'] },
       },
+      include: {
+        team: {
+          select: {
+            name: true,
+          },
+        },
+      },
     });
 
     if (!teamMembership) {

@@ -102,11 +102,6 @@ export async function POST(
         mentions: body.mentions || [],
         decisionId: id,
         userId: session.user.email,
-        user: {
-          connect: {
-            email: session.user.email,
-          },
-        },
       },
       include: {
         user: {
