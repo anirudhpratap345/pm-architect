@@ -7,7 +7,14 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "studio": "prisma studio"
+    "studio": "prisma studio",
+    "postinstall": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate deploy",
+    "db:seed": "tsx prisma/seed.ts",
+    "type-check": "tsc --noEmit",
+    "build:prod": "npm run type-check && npm run build",
+    "start:prod": "NODE_ENV=production next start -p $PORT"
   },
   "dependencies": {
     "@prisma/client": "^6.12.0",
@@ -29,6 +36,11 @@
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.0.0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "tsx": "^4.19.2"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
   }
 }
