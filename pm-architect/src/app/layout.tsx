@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import ClientLayout from "./client-layout";
+import GradientOverlay from "@/components/common/GradientOverlay";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans", 
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
+  display: 'swap',
 });
 
 const geistMono = Geist_Mono({
@@ -14,21 +16,18 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PMArchitect.ai - AI-Driven Decision Intelligence Platform",
-  description: "Enable product-facing roles to make architectural and ML model decisions with clarity, speed, and confidence.",
-  keywords: ["product management", "decision making", "AI architecture", "ML models", "technical decisions"],
-  authors: [{ name: "PMArchitect.ai Team" }],
-  creator: "PMArchitect.ai",
+  title: "PMArchitect.ai — AI-driven Metric Comparison for Everyone",
+  description: "Compare technologies, frameworks, and systems intelligently with AI-driven insights, validation, and recommendations.",
   openGraph: {
-    title: "PMArchitect.ai - AI-Driven Decision Intelligence Platform",
-    description: "Enable product-facing roles to make architectural and ML model decisions with clarity, speed, and confidence.",
+    title: "PMArchitect.ai",
+    description: "AI-driven metric comparison for builders, founders, and developers.",
+    url: "https://www.pmarchitect.ai",
     type: "website",
-    locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "PMArchitect.ai - AI-Driven Decision Intelligence Platform",
-    description: "Enable product-facing roles to make architectural and ML model decisions with clarity, speed, and confidence.",
+    title: "PMArchitect.ai — AI-driven metric comparison for everyone",
+    description: "Compare technologies, models, and architectures with metrics, evidence, and recommendations.",
   },
 };
 
@@ -41,9 +40,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${inter.variable} ${geistMono.variable} antialiased`}
       >
+        <meta name="theme-color" content="#0A0A0A" />
         <ClientLayout>
+          <GradientOverlay />
           {children}
         </ClientLayout>
       </body>

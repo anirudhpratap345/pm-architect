@@ -33,7 +33,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="text-center text-gray-600 mt-6 text-sm">
-        © 2025 PMArchitect.ai – Built with <span className="text-red-500">❤️</span> for PMs
+        © 2025 PMArchitect.ai – Built with <span className="text-red-500">❤️</span> for everyone building with technology
       </div>
     </footer>
   );

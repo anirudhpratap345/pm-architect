@@ -16,7 +16,7 @@ export default function Hero() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7 }}
       > 
-        Bridge the AI Decision Gap Between PMs and Engineers
+        AI-driven metric comparison for anyone building or evaluating technology
       </motion.h1>
       <motion.p
         className="mt-6 text-lg text-gray-300 max-w-2xl mx-auto"
@@ -24,7 +24,7 @@ export default function Hero() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2, duration: 0.7 }}
       >
-        Empower PMs to confidently choose the right models, understand tradeoffs, and align with engineers — even under tight deadlines.
+        Compare tools, models, and architectures with clear metrics, evidence, and recommendations — built for developers, founders, analysts, and students.
       </motion.p>
       <motion.div
         className="mt-10 flex flex-col sm:flex-row gap-4 justify-center"
@@ -36,7 +36,7 @@ export default function Hero() {
           href="/get-started"
           className="bg-sky-500 hover:bg-sky-600 text-white rounded-full px-8 py-4 font-semibold text-lg shadow-lg transition duration-200 min-w-[220px]"
         >
-          Start using PMArchitect
+          Try PMArchitect
         </a>
         <a
           href="/demo"
@@ -50,7 +50,7 @@ export default function Hero() {
         <img src="https://randomuser.me/api/portraits/men/32.jpg" className="w-10 h-10 rounded-full border-2 border-sky-500" alt="Meta" />
         <img src="https://randomuser.me/api/portraits/women/44.jpg" className="w-10 h-10 rounded-full border-2 border-sky-500" alt="Google" />
         <img src="https://randomuser.me/api/portraits/men/65.jpg" className="w-10 h-10 rounded-full border-2 border-sky-500" alt="Startup" />
-        <span className="ml-4 text-gray-400 text-sm">Trusted by product leaders at Meta, Google, and fast-growing startups.</span>
+        <span className="ml-4 text-gray-400 text-sm">Trusted by builders and teams across startups and enterprises.</span>
       </div>
     </section>
   );
