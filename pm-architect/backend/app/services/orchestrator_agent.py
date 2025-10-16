@@ -1,6 +1,7 @@
 import time
 import uuid
 import logging
+import asyncio
 from typing import Any, Dict, List, Optional, Tuple
 
 from ..config import settings
@@ -48,6 +49,10 @@ class OrchestratorAgent:
     self.use_dummy_agents = settings.use_dummy_agents if use_dummy_agents is None else use_dummy_agents
     self.use_researcher = getattr(settings, 'use_researcher', True) if use_researcher is None else use_researcher
     self.use_validator = getattr(settings, 'use_validator', True) if use_validator is None else use_validator
+    
+  def run_sync(self, query: Optional[str] = None, options: Optional[List[str]] = None, metrics: Optional[List[str]] = None, context: Optional[str] = None) -> Dict[str, Any]:
+    """Synchronous version of run for RQ worker"""
+    return asyncio.run(self.run(query, options, metrics, context))
 
   async def run(
     self,

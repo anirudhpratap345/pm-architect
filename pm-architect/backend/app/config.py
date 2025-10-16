@@ -11,6 +11,16 @@ class Settings(BaseSettings):
   use_researcher: bool = Field(default=True, env="USE_RESEARCHER")
   use_validator: bool = Field(default=True, env="USE_VALIDATOR")
   validator_model: Optional[str] = Field(default=None, env="VALIDATOR_MODEL")
+  
+  # Database configuration
+  database_url: str = Field(default="", env="DATABASE_URL")
+  
+  # Redis configuration
+  redis_url: str = Field(default="redis://localhost:6379", env="REDIS_URL")
+  
+  # App configuration
+  secret_key: str = Field(default="dev-secret-key", env="SECRET_KEY")
+  app_env: str = Field(default="development", env="APP_ENV")
 
   model_config = SettingsConfigDict(
     case_sensitive=False,
