@@ -5,7 +5,7 @@ from typing import Dict, Any
 from rq import get_current_job
 from sqlalchemy.orm import Session
 
-from .db import SessionLocal, Comparison, ActivityLog
+from .db import get_session_local, Comparison, ActivityLog
 from .redis_client import RedisCache
 from .services.orchestrator_agent import OrchestratorAgent
 
@@ -21,7 +21,12 @@ def process_comparison(job_data: Dict[str, Any]) -> Dict[str, Any]:
     
     logger.info(f"Processing comparison job: {job_id}")
     
-    db = SessionLocal()
+    session_factory = get_session_local()
+    if not session_factory:
+        logger.error("Database not configured - cannot process job")
+        raise Exception("Database not configured")
+    
+    db = session_factory()
     cache = RedisCache()
     
     try:
@@ -114,9 +119,14 @@ def create_comparison_job(
     """
     import uuid
     
+    session_factory = get_session_local()
+    if not session_factory:
+        logger.error("Database not configured - cannot create job")
+        raise Exception("Database not configured")
+    
     job_id = str(uuid.uuid4())
     
-    db = SessionLocal()
+    db = session_factory()
     try:
         # Create comparison record
         comparison = Comparison(

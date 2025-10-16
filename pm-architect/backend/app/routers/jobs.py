@@ -30,6 +30,9 @@ async def create_job(
 async def get_job(job_id: str, db: Session = Depends(get_db)):
     """Get job status and result"""
     try:
+        if not db:
+            raise HTTPException(status_code=503, detail="Database not configured")
+        
         # Get from database
         comparison = db.query(Comparison).filter(Comparison.job_id == job_id).first()
         if not comparison:

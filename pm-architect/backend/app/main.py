@@ -7,7 +7,7 @@ from .config import settings
 from .routers.compare import router as compare_router
 from .routers.jobs import router as jobs_router
 from .db import init_db, test_db_connection, get_db
-from .redis_client import test_redis_connection
+from .redis_client import test_redis_connection 
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -28,22 +28,29 @@ app.add_middleware(
 async def startup_event():
     """Initialize database and test connections on startup"""
     try:
-        # Initialize database
-        init_db()
+        logger.info("🚀 Starting PMArchitect Backend...")
         
-        # Test connections
+        # Initialize database (skips if DATABASE_URL not set)
+        init_db()
+
+        # Test connections (report-only)
         db_ok = test_db_connection()
         redis_ok = test_redis_connection()
+
+        if db_ok:
+            logger.info("✅ Database connected successfully")
+        else:
+            logger.warning("⚠️  Database not configured or connection failed - features depending on DB are disabled")
         
-        if not db_ok:
-            logger.warning("Database connection failed - some features may not work")
-        if not redis_ok:
-            logger.warning("Redis connection failed - caching and background jobs disabled")
-            
-        logger.info("Backend startup completed")
+        if redis_ok:
+            logger.info("✅ Redis connected successfully")
+        else:
+            logger.warning("⚠️  Redis not configured or connection failed - caching and background jobs disabled")
+
+        logger.info("🎉 Backend startup completed successfully")
     except Exception as e:
-        logger.error(f"Startup failed: {e}")
-        # Don't raise - allow app to start with degraded functionality
+        logger.error(f"❌ Startup encountered errors: {e}")
+        # Do not raise - app should start with degraded functionality
 
 
 @app.get("/health")
