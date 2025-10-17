@@ -7,6 +7,7 @@ import logging
 
 from .config import settings
 from .routers.compare import router as compare_router
+from .routers.history import router as history_router
 from .routers.jobs import router as jobs_router
 from .db import init_db, test_db_connection, get_db, get_engine
 from .redis_client import test_redis_connection
@@ -123,8 +124,9 @@ def list_all_keys(pattern: str = "*"):
     return {"pattern": pattern, "keys": keys, "count": len(keys)}
 
 
-# Include routers - compare router works without DB
+# Include routers - compare and history work without DB
 app.include_router(compare_router, prefix="/api")
+app.include_router(history_router, prefix="/api")
 
 # Jobs router requires database - conditionally include
 engine = get_engine()
