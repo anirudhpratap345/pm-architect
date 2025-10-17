@@ -1,8 +1,9 @@
-from pydantic import AnyHttpUrl, Field
+from pydantic import AnyHttpUrl, Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from typing import List, Optional
+from typing import List, Optional, Union
 from pathlib import Path
 import logging
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +19,25 @@ env_file_path = ENV_LOCAL if ENV_LOCAL.exists() else ENV_FILE
 
 class Settings(BaseSettings):
   gemini_api_key: str = Field(default="", env="GEMINI_API_KEY")
-  cors_origins: List[AnyHttpUrl] = Field(default_factory=list, env="CORS_ORIGINS")
+  cors_origins: Union[List[AnyHttpUrl], str] = Field(default_factory=list, env="CORS_ORIGINS")
+  
+  @field_validator('cors_origins', mode='before')
+  @classmethod
+  def parse_cors_origins(cls, v):
+    """Parse CORS_ORIGINS from various formats"""
+    if not v or v == "":
+      return []
+    if isinstance(v, list):
+      return v
+    if isinstance(v, str):
+      # Try JSON parse first
+      try:
+        parsed = json.loads(v)
+        return parsed if isinstance(parsed, list) else [parsed]
+      except (json.JSONDecodeError, ValueError):
+        # Fall back to comma-separated
+        return [origin.strip() for origin in v.split(',') if origin.strip()]
+    return []
   model_name: str = Field(default="gemini-2.5-pro", env="GEMINI_MODEL")
   use_dummy_agents: bool = Field(default=False, env="USE_DUMMY_AGENTS")
   use_researcher: bool = Field(default=True, env="USE_RESEARCHER")

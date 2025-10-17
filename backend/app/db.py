@@ -60,9 +60,18 @@ def get_session_local():
     return _SessionLocal
 
 
+# Export for backward compatibility - these are callable getters
+def get_engine_export():
+    """Export-safe getter for engine"""
+    return get_engine()
+
+def get_session_local_export():
+    """Export-safe getter for SessionLocal"""
+    return get_session_local()
+
 # For backward compatibility
-engine = None
-SessionLocal = None
+engine = get_engine()
+SessionLocal = get_session_local()
 
 
 class Comparison(Base):

@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from .db import get_session_local, Comparison, ActivityLog
 from .redis_client import RedisCache
+from .redis_store import RedisJobStore
 from .services.orchestrator_agent import OrchestratorAgent
 
 logger = logging.getLogger(__name__)
@@ -14,7 +15,8 @@ logger = logging.getLogger(__name__)
 
 def process_comparison(job_data: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Process a comparison job - this runs in the RQ worker
+    Process a comparison job - this runs in the RQ worker.
+    Works with or without PostgreSQL by falling back to Redis.
     """
     job = get_current_job()
     job_id = job.id if job else "unknown"
@@ -22,28 +24,35 @@ def process_comparison(job_data: Dict[str, Any]) -> Dict[str, Any]:
     logger.info(f"Processing comparison job: {job_id}")
     
     session_factory = get_session_local()
-    if not session_factory:
-        logger.error("Database not configured - cannot process job")
-        raise Exception("Database not configured")
+    use_database = session_factory is not None
     
-    db = session_factory()
+    db = None
+    comparison = None
     cache = RedisCache()
     
     try:
-        # Update job status to processing
-        comparison = db.query(Comparison).filter(Comparison.job_id == job_id).first()
-        if comparison:
-            comparison.status = "processing"
-            db.commit()
+        # Initialize database if available
+        if use_database:
+            db = session_factory()
+            comparison = db.query(Comparison).filter(Comparison.job_id == job_id).first()
             
-            # Log activity
-            activity = ActivityLog(
-                comparison_id=comparison.id,
-                action="job_started",
-                details=json.dumps({"job_id": job_id})
-            )
-            db.add(activity)
-            db.commit()
+            # Update job status to processing
+            if comparison:
+                comparison.status = "processing"
+                db.commit()
+                
+                # Log activity
+                activity = ActivityLog(
+                    comparison_id=comparison.id,
+                    action="job_started",
+                    details=json.dumps({"job_id": job_id})
+                )
+                db.add(activity)
+                db.commit()
+        else:
+            # Use Redis fallback
+            logger.info("Using Redis for job tracking (database not available)")
+            RedisJobStore.update_job_status(job_id, "processing")
         
         # Check cache first
         cache_key = f"{job_data.get('options', [])}_{job_data.get('metrics', [])}_{job_data.get('context', '')}"
@@ -66,8 +75,8 @@ def process_comparison(job_data: Dict[str, Any]) -> Dict[str, Any]:
             # Cache the result
             cache.set(cache_key, result)
         
-        # Update database with result
-        if comparison:
+        # Update with result
+        if use_database and comparison:
             comparison.status = "completed"
             comparison.result = json.dumps(result)
             db.commit()
@@ -80,6 +89,9 @@ def process_comparison(job_data: Dict[str, Any]) -> Dict[str, Any]:
             )
             db.add(activity)
             db.commit()
+        else:
+            # Use Redis fallback
+            RedisJobStore.update_job_status(job_id, "completed", result=result)
         
         logger.info(f"Job {job_id} completed successfully")
         return result
@@ -87,8 +99,8 @@ def process_comparison(job_data: Dict[str, Any]) -> Dict[str, Any]:
     except Exception as e:
         logger.error(f"Job {job_id} failed: {e}")
         
-        # Update database with error
-        if comparison:
+        # Update with error
+        if use_database and comparison:
             comparison.status = "failed"
             comparison.error_message = str(e)
             db.commit()
@@ -101,11 +113,15 @@ def process_comparison(job_data: Dict[str, Any]) -> Dict[str, Any]:
             )
             db.add(activity)
             db.commit()
+        else:
+            # Use Redis fallback
+            RedisJobStore.update_job_status(job_id, "failed", error=str(e))
         
         raise e
         
     finally:
-        db.close()
+        if db:
+            db.close()
 
 
 def create_comparison_job(
@@ -115,17 +131,44 @@ def create_comparison_job(
     query: str = ""
 ) -> str:
     """
-    Create a new comparison job and return job ID
+    Create a new comparison job and return job ID.
+    Works with or without PostgreSQL by falling back to Redis.
     """
     import uuid
     
     session_factory = get_session_local()
-    if not session_factory:
-        logger.error("Database not configured - cannot create job")
-        raise Exception("Database not configured")
+    use_database = session_factory is not None
     
     job_id = str(uuid.uuid4())
     
+    if not use_database:
+        # Use Redis-only approach
+        logger.info("Creating job in Redis (database not available)")
+        success = RedisJobStore.create_job(job_id, options, metrics, context, query)
+        
+        if not success:
+            logger.error("Failed to create job in Redis")
+            raise Exception("Failed to create job - Redis unavailable")
+        
+        # Enqueue job
+        job_data = {
+            "job_id": job_id,
+            "options": options,
+            "metrics": metrics,
+            "context": context,
+            "query": query
+        }
+        
+        from .redis_client import enqueue_compare_job
+        enqueued_job_id = enqueue_compare_job(job_data)
+        
+        if not enqueued_job_id:
+            RedisJobStore.update_job_status(job_id, "failed", error="Failed to enqueue job")
+            raise Exception("Failed to enqueue job")
+        
+        return job_id
+    
+    # Use database approach
     db = session_factory()
     try:
         # Create comparison record

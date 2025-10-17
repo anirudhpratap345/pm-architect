@@ -1,13 +1,16 @@
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
+from pydantic import BaseModel
+from typing import Dict, Any
 import logging
 
 from .config import settings
 from .routers.compare import router as compare_router
 from .routers.jobs import router as jobs_router
-from .db import init_db, test_db_connection, get_db
-from .redis_client import test_redis_connection 
+from .db import init_db, test_db_connection, get_db, get_engine
+from .redis_client import test_redis_connection
+from .redis_store import save_data, get_data, list_keys
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -76,7 +79,74 @@ def test_redis():
         raise HTTPException(status_code=500, detail="Redis connection failed")
 
 
+@app.get("/")
+def root():
+    """Root endpoint - confirms backend is live"""
+    return {"message": "PM Architect Backend is live!"}
+
+
+# Demo endpoints for Redis persistence
+class SavePayload(BaseModel):
+    key: str
+    message: str
+    data: Dict[str, Any] = {}
+
+
+@app.post("/save")
+def save_item(payload: SavePayload):
+    """Save data to Redis (demo endpoint)"""
+    data = {
+        "key": payload.key,
+        "message": payload.message,
+        "data": payload.data
+    }
+    success = save_data(payload.key, data)
+    if success:
+        return {"status": "saved", "key": payload.key}
+    else:
+        raise HTTPException(status_code=503, detail="Redis unavailable")
+
+
+@app.get("/get/{key}")
+def get_item(key: str):
+    """Get data from Redis (demo endpoint)"""
+    data = get_data(key)
+    if data:
+        return {"key": key, "data": data}
+    return {"error": "not found"}
+
+
+@app.get("/keys")
+def list_all_keys(pattern: str = "*"):
+    """List all Redis keys matching pattern (demo endpoint)"""
+    keys = list_keys(pattern)
+    return {"pattern": pattern, "keys": keys, "count": len(keys)}
+
+
+# Include routers - compare router works without DB
 app.include_router(compare_router, prefix="/api")
-app.include_router(jobs_router, prefix="/api")
+
+# Jobs router requires database - conditionally include
+engine = get_engine()
+if engine:
+    logger.info("✅ Including jobs router (database available)")
+    app.include_router(jobs_router, prefix="/api")
+else:
+    logger.warning("⚠️ Skipping jobs router (database unavailable)")
+    
+    # Add a placeholder endpoint that explains the situation
+    @app.get("/api/jobs/{job_id}")
+    def jobs_unavailable(job_id: str):
+        raise HTTPException(
+            status_code=503, 
+            detail="Job management requires database. Use /api/compare endpoint for direct comparisons."
+        )
+    
+    @app.post("/api/jobs")
+    def create_job_unavailable():
+        raise HTTPException(
+            status_code=503,
+            detail="Job management requires database. Use /api/compare endpoint for direct comparisons."
+        )
 
 
