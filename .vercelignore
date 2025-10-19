@@ -1,0 +1,17 @@
+# Vercel build cache - force clean builds
+.next/
+.vercel/
+node_modules/
+.cache/
+tsconfig.tsbuildinfo
+
+# Old database artifacts
+prisma/
+*.db
+*.sqlite
+
+# Environment files (set in Vercel dashboard)
+.env
+.env.local
+.env*.local
+
