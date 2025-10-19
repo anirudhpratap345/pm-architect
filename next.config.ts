@@ -43,7 +43,7 @@ const nextConfig: NextConfig = {
 
   // Experimental features for better performance
   experimental: {
-    optimizePackageImports: ['@prisma/client'],
+    optimizePackageImports: ['recharts', 'framer-motion'],
   },
 
   // Proxy API requests to backend during development

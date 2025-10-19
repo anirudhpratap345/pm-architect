@@ -31,7 +31,6 @@ export const metadata: Metadata = {
   },
 };
 
-// NOTE: SessionProvider from next-auth/react should be used in a client layout, not here, since this is a server component.
 export default function RootLayout({
   children,
 }: Readonly<{
