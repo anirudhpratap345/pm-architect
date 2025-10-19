@@ -101,3 +101,31 @@ def delete_decision(decision_id: str) -> bool:
     return True
 
 
+# Bulk import and admin helpers
+def import_decisions(decisions: List[Dict[str, Any]]) -> int:
+    """Import a list of decisions (dedupe by id). Returns number imported/updated."""
+    if not isinstance(decisions, list):
+        return 0
+    existing = _read_all()
+    id_to_index = {str(it.get('id')): i for i, it in enumerate(existing) if it.get('id')}
+    imported = 0
+    for dec in decisions:
+        norm = _normalize_decision(dec or {})
+        key = str(norm.get('id'))
+        if key in id_to_index:
+            existing[id_to_index[key]] = norm
+        else:
+            id_to_index[key] = len(existing)
+            existing.append(norm)
+        imported += 1
+    _write_all(existing)
+    return imported
+
+
+def clear_all_decisions() -> int:
+    """Delete all decisions. Returns previous count."""
+    items = _read_all()
+    count = len(items)
+    _write_all([])
+    return count
+

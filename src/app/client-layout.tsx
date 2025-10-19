@@ -1,5 +1,4 @@
 "use client";
-import { SessionProvider } from "next-auth/react";
 import { useEffect, useMemo, useState } from "react";
 
 function ScrollProgressBar() {
@@ -31,9 +30,9 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   }, []);
 
   return (
-    <SessionProvider refetchInterval={5 * 60} refetchOnWindowFocus={true}>
+    <>
       {!prefersReducedMotion && <ScrollProgressBar />}
       {children}
-    </SessionProvider>
+    </>
   );
 } 

@@ -7,6 +7,8 @@ from ..data_store import (
     get_all_decisions,
     get_decision_by_id,
     delete_decision,
+    import_decisions,
+    clear_all_decisions,
 )
 
 
@@ -49,4 +51,19 @@ def remove_history_item(decision_id: str):
         raise HTTPException(status_code=404, detail="Decision not found")
     return {"status": "deleted", "id": decision_id}
 
+
+class ImportPayload(BaseModel):
+    items: List[Dict[str, Any]]
+
+
+@router.post("/history/import")
+def import_history(payload: ImportPayload):
+    count = import_decisions(payload.items or [])
+    return {"status": "ok", "imported": count}
+
+
+@router.delete("/history")
+def clear_history():
+    count = clear_all_decisions()
+    return {"status": "cleared", "previous_count": count}
 

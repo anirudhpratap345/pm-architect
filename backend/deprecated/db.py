@@ -95,7 +95,7 @@ class ActivityLog(Base):
     id = Column(Integer, primary_key=True, index=True)
     comparison_id = Column(Integer, index=True)
     action = Column(String)  # job_created, job_started, job_completed, job_failed
-    details = Column(Text)  # JSON string
+    details = Column(Text)  # JSON string 
     created_at = Column(DateTime, default=func.now())
 
 
