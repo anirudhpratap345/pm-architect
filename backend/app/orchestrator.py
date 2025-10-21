@@ -15,6 +15,7 @@ from typing import Any, Dict, List, Optional
 import json
 import time
 import uuid
+import os
 
 from .agents.llm_client import call_gemini
 from .data_store import save_decision
@@ -186,3 +187,46 @@ def _normalize_metrics(metrics: List[Dict[str, Any]]) -> Dict[str, Dict[str, Any
             "delta": m.get("delta", "0%")
         }
     return result
+
+
+@router.get("/debug/compare")
+async def debug_compare():
+    """
+    Developer route for verifying orchestrator + Gemini pipeline.
+    - Works in stub mode if GEMINI_API_KEY missing.
+    - Returns timing, mode, and example output.
+    """
+    start = time.time()
+    api_key = os.getenv("GEMINI_API_KEY", "")
+    mode = "real" if api_key else "stub"
+    
+    system_prompt = "You are an evaluation engine that compares two technologies concisely in JSON."
+    user_prompt = (
+        "Compare Redis and MongoDB for caching and scalability. "
+        "Return valid JSON with metrics, summary, and confidence."
+    )
+    
+    try:
+        response = call_gemini(system_prompt, user_prompt)
+        duration = round(time.time() - start, 2)
+        
+        # Try to parse as JSON, fallback to raw text
+        try:
+            parsed_result = json.loads(response) if response.strip().startswith("{") else {"raw_text": response}
+        except json.JSONDecodeError:
+            parsed_result = {"raw_text": response}
+        
+        return {
+            "status": "ok",
+            "mode": mode,
+            "duration_sec": duration,
+            "example_query": "Redis vs MongoDB",
+            "result": parsed_result,
+        }
+    except Exception as e:
+        return {
+            "status": "error", 
+            "error": str(e), 
+            "mode": mode,
+            "duration_sec": round(time.time() - start, 2)
+        }
