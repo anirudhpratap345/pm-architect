@@ -34,10 +34,10 @@ app = FastAPI(
 )
 
 
-# Configure CORS
+# ✅ Strict, safe CORS setup
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[str(o) for o in settings.cors_origins] or ["*"],
+    allow_origins=settings.cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -69,7 +69,8 @@ def health():
     return {
         "status": "ok",
         "version": "1.0.0-lite",
-        "gemini_configured": bool(settings.gemini_api_key)
+        "gemini_configured": bool(settings.gemini_api_key),
+        "allowed_origins": settings.cors_origins,
     }
 
 
