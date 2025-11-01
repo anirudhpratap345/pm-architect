@@ -16,6 +16,8 @@ import logging
 from .config import settings
 from .orchestrator import router as orchestrator_router
 from .routers.history import router as history_router
+from .routers.options import router as options_router
+from .routers.catalog import router as catalog_router
 
 
 # Configure logging
@@ -77,6 +79,8 @@ def health():
 # Include routers
 app.include_router(orchestrator_router, prefix="/api")
 app.include_router(history_router, prefix="/api")
+app.include_router(options_router, prefix="/api")
+app.include_router(catalog_router, prefix="/api")
 
 
 logger.info("✅ All routes registered successfully")

@@ -9,6 +9,13 @@ PRODUCTION MODE: Set GEMINI_API_KEY in environment to enable real Gemini API cal
 import json
 import os
 from typing import Optional
+from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables from .env.local or .env
+project_root = Path(__file__).parent.parent.parent.parent
+load_dotenv(project_root / ".env.local")
+load_dotenv(project_root / ".env")
 
 # Optional: import Gemini SDK if available
 try:
@@ -75,29 +82,56 @@ def _dev_stub(user_prompt: str) -> str:
     Parses options from user_prompt if possible.
     """
     # Try to extract options from prompt
-    left_option = "Redis"
-    right_option = "Memcached"
+    left_option = "Option A"
+    right_option = "Option B"
     
-    if "options" in user_prompt.lower() or "vs" in user_prompt.lower():
-        # Simple heuristic: look for common patterns
-        if "react" in user_prompt.lower():
-            left_option = "React"
-            right_option = "Vue" if "vue" in user_prompt.lower() else "Angular"
-        elif "gpt" in user_prompt.lower():
-            left_option = "GPT-4o"
-            right_option = "Gemini 2.5" if "gemini" in user_prompt.lower() else "Claude 3.5"
-        elif "python" in user_prompt.lower():
-            left_option = "Python"
-            right_option = "JavaScript" if "javascript" in user_prompt.lower() else "Go"
+    # Look for "Options to compare: X vs Y" pattern
+    import re
+    options_match = re.search(r'Options to compare:\s*([^\s]+)\s+vs\s+([^\s\n]+)', user_prompt, re.IGNORECASE)
+    if options_match:
+        left_option = options_match.group(1).strip()
+        right_option = options_match.group(2).strip()
     
     return json.dumps({
         "left": left_option,
         "right": right_option,
         "metrics": [
-            {"name": "Performance", "A": 85, "B": 78, "delta": "+9%"},
-            {"name": "Ease of Use", "A": 90, "B": 85, "delta": "+6%"},
-            {"name": "Community Support", "A": 95, "B": 80, "delta": "+19%"},
-            {"name": "Cost", "A": 3.5, "B": 2.8, "delta": "-20%"}
+            {
+                "name": "Performance",
+                "A": 85,
+                "B": 78,
+                "delta": "+9%",
+                "explanation": "How fast and efficient the technology handles workloads",
+                "A_reason": f"{left_option} demonstrates strong performance in benchmark tests with optimized caching.",
+                "B_reason": f"{right_option} shows good performance but slightly lower throughput under heavy load."
+            },
+            {
+                "name": "Ease of Use",
+                "A": 90,
+                "B": 85,
+                "delta": "+6%",
+                "explanation": "How quickly developers can learn and become productive",
+                "A_reason": f"{left_option} has intuitive APIs and excellent documentation making onboarding smooth.",
+                "B_reason": f"{right_option} is developer-friendly with good docs, though slightly steeper learning curve."
+            },
+            {
+                "name": "Community Support",
+                "A": 95,
+                "B": 80,
+                "delta": "+19%",
+                "explanation": "Size and activity of the community, available resources",
+                "A_reason": f"{left_option} benefits from a large, active community with extensive third-party resources.",
+                "B_reason": f"{right_option} has solid community support but smaller ecosystem compared to competitors."
+            },
+            {
+                "name": "Cost",
+                "A": 3.5,
+                "B": 2.8,
+                "delta": "-20%",
+                "explanation": "Total cost of ownership including hosting and operational expenses",
+                "A_reason": f"{left_option} has moderate pricing with some premium features requiring paid tiers.",
+                "B_reason": f"{right_option} offers competitive pricing with generous free tier and lower operational costs."
+            }
         ],
         "summary": f"{left_option} offers better performance and ecosystem support, while {right_option} provides lower operational costs. Consider {left_option} for high-throughput scenarios.",
         "confidence": "high",

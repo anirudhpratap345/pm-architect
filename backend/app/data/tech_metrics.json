@@ -1,0 +1,19 @@
+[
+  {
+    "tech_id": "react",
+    "last_updated": "2025-10-28T10:00:00Z",
+    "metrics": [
+      {"metric_id": "maturity", "score": 9, "delta": 1, "explained_reason": "Large ecosystem, battle-tested in production.", "confidence": 0.9,
+        "evidence_refs": [{"source_id": "s1", "excerpt": "React adoption across enterprises", "url": "https://react.dev"}]},
+      {"metric_id": "learning_curve", "score": 6.5, "delta": -0.5, "explained_reason": "JSX and hooks add initial complexity.", "confidence": 0.75}
+    ]
+  },
+  {
+    "tech_id": "vue",
+    "last_updated": "2025-10-28T10:00:00Z",
+    "metrics": [
+      {"metric_id": "maturity", "score": 8, "delta": 0, "explained_reason": "Stable releases, strong community.", "confidence": 0.85}
+    ]
+  }
+]
+

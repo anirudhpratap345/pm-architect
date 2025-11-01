@@ -40,14 +40,31 @@ Given a user query and two options to compare, produce a structured JSON compari
 - A concise summary recommendation
 - Confidence level (high/medium/low)
 - Evidence-based bullet points
+- Detailed explanations for each metric per option
 
 Output **ONLY valid JSON** in this exact format:
 {
   "left": "<Option A name>",
   "right": "<Option B name>",
   "metrics": [
-    {"name": "Performance", "A": 85, "B": 78, "delta": "+9%"},
-    {"name": "Scalability", "A": 90, "B": 85, "delta": "+6%"}
+    {
+      "name": "Performance",
+      "A": 85,
+      "B": 78,
+      "delta": "+9%",
+      "explanation": "General explanation of what this metric measures",
+      "A_reason": "Why option A got this score (1-2 sentences)",
+      "B_reason": "Why option B got this score (1-2 sentences)"
+    },
+    {
+      "name": "Scalability",
+      "A": 90,
+      "B": 85,
+      "delta": "+6%",
+      "explanation": "General explanation of what this metric measures",
+      "A_reason": "Specific reason for A's score",
+      "B_reason": "Specific reason for B's score"
+    }
   ],
   "summary": "Brief recommendation (2-3 sentences max)",
   "confidence": "high",
@@ -61,7 +78,9 @@ Rules:
 - Use realistic, domain-appropriate metrics (3-5 metrics)
 - Scores must be 0-100 range
 - Delta can be percentage or absolute difference
-- Keep summary concise and actionable
+- Include 'explanation' for what each metric measures (generic)
+- Include 'A_reason' and 'B_reason' for tech-specific score explanations
+- Keep all text concise (1-2 sentences per reason)
 - Evidence must be factual and specific
 - Respond ONLY with valid JSON, no markdown, no extra text
 """
@@ -197,7 +216,7 @@ async def debug_compare():
     - Returns timing, mode, and example output.
     """
     start = time.time()
-    api_key = os.getenv("GEMINI_API_KEY", "")
+    api_key = os.getenv("GEMINI_API_KEY", "") 
     mode = "real" if api_key else "stub"
     
     system_prompt = "You are an evaluation engine that compares two technologies concisely in JSON."

@@ -1,0 +1,91 @@
+[
+  {
+    "id": "react",
+    "name": "React",
+    "slug": "react",
+    "short_desc": "UI library for building interactive UIs",
+    "categories": ["frontend"],
+    "tags": ["ui", "javascript", "spa"],
+    "aliases": ["reactjs"],
+    "meta": { "official_url": "https://react.dev" },
+    "popularity": 92.5
+  },
+  {
+    "id": "vue",
+    "name": "Vue",
+    "slug": "vue",
+    "short_desc": "Progressive framework for building UIs",
+    "categories": ["frontend"],
+    "tags": ["ui", "javascript"],
+    "aliases": ["vuejs"],
+    "meta": { "official_url": "https://vuejs.org" },
+    "popularity": 85.0
+  },
+  {
+    "id": "nextjs",
+    "name": "Next.js",
+    "slug": "nextjs",
+    "short_desc": "React framework for production apps",
+    "categories": ["frontend"],
+    "tags": ["react", "ssr", "ssg"],
+    "aliases": ["next"],
+    "meta": { "official_url": "https://nextjs.org" },
+    "popularity": 90.0
+  },
+  {
+    "id": "fastapi",
+    "name": "FastAPI",
+    "slug": "fastapi",
+    "short_desc": "High-performance Python API framework",
+    "categories": ["backend"],
+    "tags": ["python", "api"],
+    "aliases": [],
+    "meta": { "official_url": "https://fastapi.tiangolo.com" },
+    "popularity": 80.0
+  },
+  {
+    "id": "postgres",
+    "name": "PostgreSQL",
+    "slug": "postgres",
+    "short_desc": "Advanced open-source relational database",
+    "categories": ["databases"],
+    "tags": ["sql", "rdbms"],
+    "aliases": ["postgresql"],
+    "meta": { "official_url": "https://www.postgresql.org" },
+    "popularity": 88.0
+  },
+  {
+    "id": "redis",
+    "name": "Redis",
+    "slug": "redis",
+    "short_desc": "In-memory data store for cache and queues",
+    "categories": ["databases", "devops"],
+    "tags": ["cache", "queue"],
+    "aliases": [],
+    "meta": { "official_url": "https://redis.io" },
+    "popularity": 86.0
+  },
+  {
+    "id": "firebase",
+    "name": "Firebase",
+    "slug": "firebase",
+    "short_desc": "Google's platform for mobile and web app development",
+    "categories": ["databases", "backend", "cloud"],
+    "tags": ["baas", "realtime", "nosql", "google"],
+    "aliases": [],
+    "meta": { "official_url": "https://firebase.google.com" },
+    "popularity": 84.0
+  },
+  {
+    "id": "supabase",
+    "name": "Supabase",
+    "slug": "supabase",
+    "short_desc": "Open-source Firebase alternative with PostgreSQL",
+    "categories": ["databases", "backend", "cloud"],
+    "tags": ["baas", "realtime", "postgres", "opensource"],
+    "aliases": [],
+    "meta": { "official_url": "https://supabase.com" },
+    "popularity": 82.0
+  }
+]
+

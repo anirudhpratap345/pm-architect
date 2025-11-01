@@ -1,0 +1,7 @@
+[
+  { "metric_id": "maturity", "title": "Maturity", "description": "How established and battle-tested the technology is.", "scale": "0-10" },
+  { "metric_id": "learning_curve", "title": "Learning Curve", "description": "How easy it is for a team to get productive.", "scale": "0-10" },
+  { "metric_id": "performance", "title": "Performance", "description": "Runtime performance and efficiency for typical workloads.", "scale": "0-10" },
+  { "metric_id": "ecosystem", "title": "Ecosystem", "description": "Library/tooling availability and community support.", "scale": "0-10" }
+]
+

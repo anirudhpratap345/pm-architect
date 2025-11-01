@@ -181,5 +181,195 @@
 },
 "id":"6dafeeb4-77f2-4b27-9904-1c718c674e75",
 "timestamp":1760766368
+},
+{
+"id":"358c2500-239a-4a62-9f7d-57d630c7eb0b",
+"task_id":"358c2500-239a-4a62-9f7d-57d630c7eb0b",
+"timestamp":1762014839,
+"query":"firebase vs supabase on the level of infra",
+"left":"Redis",
+"right":"Memcached",
+"metrics":{
+"Performance":{
+"A":85,
+"B":78,
+"delta":"+9%"
+},
+"Ease of Use":{
+"A":90,
+"B":85,
+"delta":"+6%"
+},
+"Community Support":{
+"A":95,
+"B":80,
+"delta":"+19%"
+},
+"Cost":{
+"A":3.5,
+"B":2.8,
+"delta":"-20%"
+}
+},
+"summary":"Redis offers better performance and ecosystem support, while Memcached provides lower operational costs. Consider Redis for high-throughput scenarios.",
+"confidence":"high",
+"evidence":[
+"Redis has proven scalability in production environments",
+"Memcached shows consistent performance under moderate loads",
+"Both options are actively maintained with regular updates"
+],
+"context":{}
+},
+{
+"id":"8edb9486-5480-4aeb-a738-b9ebb880bffc",
+"task_id":"8edb9486-5480-4aeb-a738-b9ebb880bffc",
+"timestamp":1762015669,
+"query":"firebase vs supabase on the basis of infra cost",
+"left":"Redis",
+"right":"Memcached",
+"metrics":{
+"Performance":{
+"A":85,
+"B":78,
+"delta":"+9%"
+},
+"Ease of Use":{
+"A":90,
+"B":85,
+"delta":"+6%"
+},
+"Community Support":{
+"A":95,
+"B":80,
+"delta":"+19%"
+},
+"Cost":{
+"A":3.5,
+"B":2.8,
+"delta":"-20%"
+}
+},
+"summary":"Redis offers better performance and ecosystem support, while Memcached provides lower operational costs. Consider Redis for high-throughput scenarios.",
+"confidence":"high",
+"evidence":[
+"Redis has proven scalability in production environments",
+"Memcached shows consistent performance under moderate loads",
+"Both options are actively maintained with regular updates"
+],
+"context":{}
+},
+{
+"id":"b6dd30f7-e97f-44c2-9fdf-e4a84a174fdf",
+"task_id":"b6dd30f7-e97f-44c2-9fdf-e4a84a174fdf",
+"timestamp":1762018058,
+"query":"test infra cost",
+"left":"Firebase",
+"right":"Supabase",
+"metrics":{
+"Performance":{
+"A":85,
+"B":78,
+"delta":"+9%"
+},
+"Ease of Use":{
+"A":90,
+"B":85,
+"delta":"+6%"
+},
+"Community Support":{
+"A":95,
+"B":80,
+"delta":"+19%"
+},
+"Cost":{
+"A":3.5,
+"B":2.8,
+"delta":"-20%"
+}
+},
+"summary":"Firebase offers better performance and ecosystem support, while Supabase provides lower operational costs. Consider Firebase for high-throughput scenarios.",
+"confidence":"high",
+"evidence":[
+"Firebase has proven scalability in production environments",
+"Supabase shows consistent performance under moderate loads",
+"Both options are actively maintained with regular updates"
+],
+"context":{}
+},
+{
+"id":"5be1b424-4ddb-4522-b246-6efaf2480e2b",
+"task_id":"5be1b424-4ddb-4522-b246-6efaf2480e2b",
+"timestamp":1762018085,
+"query":"firebase vs supabase on the basis of infra cost",
+"left":"Firebase",
+"right":"Supabase",
+"metrics":{
+"Performance":{
+"A":85,
+"B":78,
+"delta":"+9%"
+},
+"Ease of Use":{
+"A":90,
+"B":85,
+"delta":"+6%"
+},
+"Community Support":{
+"A":95,
+"B":80,
+"delta":"+19%"
+},
+"Cost":{
+"A":3.5,
+"B":2.8,
+"delta":"-20%"
+}
+},
+"summary":"Firebase offers better performance and ecosystem support, while Supabase provides lower operational costs. Consider Firebase for high-throughput scenarios.",
+"confidence":"high",
+"evidence":[
+"Firebase has proven scalability in production environments",
+"Supabase shows consistent performance under moderate loads",
+"Both options are actively maintained with regular updates"
+],
+"context":{}
+},
+{
+"id":"588d7d1e-b41a-479a-a2ff-bfb0cf192ea9",
+"task_id":"588d7d1e-b41a-479a-a2ff-bfb0cf192ea9",
+"timestamp":1762018261,
+"query":"FastAPI vs Redis on the basis of infra cost",
+"left":"FastAPI",
+"right":"Redis",
+"metrics":{
+"Performance":{
+"A":85,
+"B":78,
+"delta":"+9%"
+},
+"Ease of Use":{
+"A":90,
+"B":85,
+"delta":"+6%"
+},
+"Community Support":{
+"A":95,
+"B":80,
+"delta":"+19%"
+},
+"Cost":{
+"A":3.5,
+"B":2.8,
+"delta":"-20%"
+}
+},
+"summary":"FastAPI offers better performance and ecosystem support, while Redis provides lower operational costs. Consider FastAPI for high-throughput scenarios.",
+"confidence":"high",
+"evidence":[
+"FastAPI has proven scalability in production environments",
+"Redis shows consistent performance under moderate loads",
+"Both options are actively maintained with regular updates"
+],
+"context":{}
 }
 ]

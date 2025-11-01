@@ -1,0 +1,14 @@
+[
+  { "id": "frontend", "label": "Frontend", "description": "UI frameworks and libraries" },
+  { "id": "backend", "label": "Backend", "description": "Server-side frameworks and runtimes" },
+  { "id": "cloud", "label": "Cloud", "description": "Cloud platforms and services" },
+  { "id": "databases", "label": "Databases", "description": "Relational and NoSQL databases" },
+  { "id": "apis", "label": "APIs", "description": "API tools and platforms" },
+  { "id": "ai-ml", "label": "AI/ML", "description": "AI and ML frameworks" },
+  { "id": "devops", "label": "DevOps", "description": "Operations and tooling" },
+  { "id": "mobile", "label": "Mobile", "description": "Mobile SDKs and toolkits" },
+  { "id": "testing", "label": "Testing", "description": "Testing frameworks and tools" },
+  { "id": "data", "label": "Data", "description": "Data engineering and analytics" },
+  { "id": "blockchain", "label": "Blockchain", "description": "Distributed ledger tech" }
+]
+
