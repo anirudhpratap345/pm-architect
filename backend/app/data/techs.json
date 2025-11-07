@@ -22,6 +22,28 @@
     "popularity": 85.0
   },
   {
+    "id": "angular",
+    "name": "Angular",
+    "slug": "angular",
+    "short_desc": "TypeScript-based web framework by Google",
+    "categories": ["frontend"],
+    "tags": ["ui", "typescript", "spa"],
+    "aliases": ["angularjs"],
+    "meta": { "official_url": "https://angular.io" },
+    "popularity": 83.0
+  },
+  {
+    "id": "svelte",
+    "name": "Svelte",
+    "slug": "svelte",
+    "short_desc": "Compiler-based UI framework with no virtual DOM",
+    "categories": ["frontend"],
+    "tags": ["ui", "javascript", "compiler"],
+    "aliases": [],
+    "meta": { "official_url": "https://svelte.dev" },
+    "popularity": 78.0
+  },
+  {
     "id": "nextjs",
     "name": "Next.js",
     "slug": "nextjs",
@@ -44,6 +66,50 @@
     "popularity": 80.0
   },
   {
+    "id": "django",
+    "name": "Django",
+    "slug": "django",
+    "short_desc": "Batteries-included Python web framework",
+    "categories": ["backend"],
+    "tags": ["python", "web", "fullstack"],
+    "aliases": [],
+    "meta": { "official_url": "https://www.djangoproject.com" },
+    "popularity": 87.0
+  },
+  {
+    "id": "express",
+    "name": "Express.js",
+    "slug": "express",
+    "short_desc": "Minimal and flexible Node.js web framework",
+    "categories": ["backend"],
+    "tags": ["nodejs", "javascript", "api"],
+    "aliases": ["expressjs"],
+    "meta": { "official_url": "https://expressjs.com" },
+    "popularity": 89.0
+  },
+  {
+    "id": "springboot",
+    "name": "Spring Boot",
+    "slug": "springboot",
+    "short_desc": "Production-ready Java framework for enterprise apps",
+    "categories": ["backend"],
+    "tags": ["java", "enterprise", "microservices"],
+    "aliases": ["spring"],
+    "meta": { "official_url": "https://spring.io/projects/spring-boot" },
+    "popularity": 86.0
+  },
+  {
+    "id": "nestjs",
+    "name": "NestJS",
+    "slug": "nestjs",
+    "short_desc": "Progressive Node.js framework with TypeScript",
+    "categories": ["backend"],
+    "tags": ["nodejs", "typescript", "api"],
+    "aliases": ["nest"],
+    "meta": { "official_url": "https://nestjs.com" },
+    "popularity": 81.0
+  },
+  {
     "id": "postgres",
     "name": "PostgreSQL",
     "slug": "postgres",
@@ -55,6 +121,28 @@
     "popularity": 88.0
   },
   {
+    "id": "mysql",
+    "name": "MySQL",
+    "slug": "mysql",
+    "short_desc": "Popular open-source relational database",
+    "categories": ["databases"],
+    "tags": ["sql", "rdbms"],
+    "aliases": [],
+    "meta": { "official_url": "https://www.mysql.com" },
+    "popularity": 87.5
+  },
+  {
+    "id": "mongodb",
+    "name": "MongoDB",
+    "slug": "mongodb",
+    "short_desc": "Document-based NoSQL database",
+    "categories": ["databases"],
+    "tags": ["nosql", "document", "json"],
+    "aliases": ["mongo"],
+    "meta": { "official_url": "https://www.mongodb.com" },
+    "popularity": 85.0
+  },
+  {
     "id": "redis",
     "name": "Redis",
     "slug": "redis",
@@ -64,6 +152,17 @@
     "aliases": [],
     "meta": { "official_url": "https://redis.io" },
     "popularity": 86.0
+  },
+  {
+    "id": "elasticsearch",
+    "name": "Elasticsearch",
+    "slug": "elasticsearch",
+    "short_desc": "Search and analytics engine",
+    "categories": ["databases", "data"],
+    "tags": ["search", "analytics", "nosql"],
+    "aliases": [],
+    "meta": { "official_url": "https://www.elastic.co" },
+    "popularity": 82.0
   },
   {
     "id": "firebase",
@@ -86,6 +185,236 @@
     "aliases": [],
     "meta": { "official_url": "https://supabase.com" },
     "popularity": 82.0
+  },
+  {
+    "id": "aws",
+    "name": "AWS",
+    "slug": "aws",
+    "short_desc": "Amazon's comprehensive cloud platform",
+    "categories": ["cloud", "devops"],
+    "tags": ["iaas", "paas", "serverless"],
+    "aliases": ["amazon web services"],
+    "meta": { "official_url": "https://aws.amazon.com" },
+    "popularity": 93.0
+  },
+  {
+    "id": "gcp",
+    "name": "Google Cloud",
+    "slug": "gcp",
+    "short_desc": "Google's cloud computing platform",
+    "categories": ["cloud", "devops"],
+    "tags": ["iaas", "paas", "ml"],
+    "aliases": ["google cloud platform"],
+    "meta": { "official_url": "https://cloud.google.com" },
+    "popularity": 88.0
+  },
+  {
+    "id": "azure",
+    "name": "Azure",
+    "slug": "azure",
+    "short_desc": "Microsoft's cloud computing platform",
+    "categories": ["cloud", "devops"],
+    "tags": ["iaas", "paas", "enterprise"],
+    "aliases": ["microsoft azure"],
+    "meta": { "official_url": "https://azure.microsoft.com" },
+    "popularity": 89.0
+  },
+  {
+    "id": "vercel",
+    "name": "Vercel",
+    "slug": "vercel",
+    "short_desc": "Platform for frontend frameworks and static sites",
+    "categories": ["cloud", "devops"],
+    "tags": ["hosting", "serverless", "nextjs"],
+    "aliases": [],
+    "meta": { "official_url": "https://vercel.com" },
+    "popularity": 81.0
+  },
+  {
+    "id": "netlify",
+    "name": "Netlify",
+    "slug": "netlify",
+    "short_desc": "Platform for modern web projects",
+    "categories": ["cloud", "devops"],
+    "tags": ["hosting", "jamstack", "ci/cd"],
+    "aliases": [],
+    "meta": { "official_url": "https://www.netlify.com" },
+    "popularity": 79.0
+  },
+  {
+    "id": "docker",
+    "name": "Docker",
+    "slug": "docker",
+    "short_desc": "Platform for containerizing applications",
+    "categories": ["devops"],
+    "tags": ["containers", "deployment"],
+    "aliases": [],
+    "meta": { "official_url": "https://www.docker.com" },
+    "popularity": 91.0
+  },
+  {
+    "id": "kubernetes",
+    "name": "Kubernetes",
+    "slug": "kubernetes",
+    "short_desc": "Container orchestration platform",
+    "categories": ["devops"],
+    "tags": ["containers", "orchestration", "k8s"],
+    "aliases": ["k8s"],
+    "meta": { "official_url": "https://kubernetes.io" },
+    "popularity": 89.0
+  },
+  {
+    "id": "terraform",
+    "name": "Terraform",
+    "slug": "terraform",
+    "short_desc": "Infrastructure as code tool",
+    "categories": ["devops"],
+    "tags": ["iac", "automation"],
+    "aliases": [],
+    "meta": { "official_url": "https://www.terraform.io" },
+    "popularity": 83.0
+  },
+  {
+    "id": "github-actions",
+    "name": "GitHub Actions",
+    "slug": "github-actions",
+    "short_desc": "CI/CD automation platform by GitHub",
+    "categories": ["devops"],
+    "tags": ["ci/cd", "automation"],
+    "aliases": [],
+    "meta": { "official_url": "https://github.com/features/actions" },
+    "popularity": 87.0
+  },
+  {
+    "id": "graphql",
+    "name": "GraphQL",
+    "slug": "graphql",
+    "short_desc": "Query language for APIs",
+    "categories": ["apis"],
+    "tags": ["api", "query"],
+    "aliases": [],
+    "meta": { "official_url": "https://graphql.org" },
+    "popularity": 84.0
+  },
+  {
+    "id": "rest",
+    "name": "REST API",
+    "slug": "rest",
+    "short_desc": "Architectural style for web services",
+    "categories": ["apis"],
+    "tags": ["api", "http"],
+    "aliases": ["restful"],
+    "meta": { "official_url": "https://restfulapi.net" },
+    "popularity": 92.0
+  },
+  {
+    "id": "grpc",
+    "name": "gRPC",
+    "slug": "grpc",
+    "short_desc": "High-performance RPC framework by Google",
+    "categories": ["apis"],
+    "tags": ["api", "rpc", "protobuf"],
+    "aliases": [],
+    "meta": { "official_url": "https://grpc.io" },
+    "popularity": 78.0
+  },
+  {
+    "id": "tensorflow",
+    "name": "TensorFlow",
+    "slug": "tensorflow",
+    "short_desc": "Machine learning framework by Google",
+    "categories": ["ai-ml"],
+    "tags": ["ml", "ai", "deeplearning"],
+    "aliases": [],
+    "meta": { "official_url": "https://www.tensorflow.org" },
+    "popularity": 88.0
+  },
+  {
+    "id": "pytorch",
+    "name": "PyTorch",
+    "slug": "pytorch",
+    "short_desc": "Deep learning framework by Meta",
+    "categories": ["ai-ml"],
+    "tags": ["ml", "ai", "deeplearning"],
+    "aliases": [],
+    "meta": { "official_url": "https://pytorch.org" },
+    "popularity": 89.0
+  },
+  {
+    "id": "langchain",
+    "name": "LangChain",
+    "slug": "langchain",
+    "short_desc": "Framework for building LLM applications",
+    "categories": ["ai-ml"],
+    "tags": ["llm", "ai", "agents"],
+    "aliases": [],
+    "meta": { "official_url": "https://www.langchain.com" },
+    "popularity": 82.0
+  },
+  {
+    "id": "openai",
+    "name": "OpenAI API",
+    "slug": "openai",
+    "short_desc": "API for GPT models and AI capabilities",
+    "categories": ["ai-ml", "apis"],
+    "tags": ["llm", "gpt", "api"],
+    "aliases": ["chatgpt api"],
+    "meta": { "official_url": "https://platform.openai.com" },
+    "popularity": 91.0
+  },
+  {
+    "id": "react-native",
+    "name": "React Native",
+    "slug": "react-native",
+    "short_desc": "Framework for building native mobile apps with React",
+    "categories": ["mobile"],
+    "tags": ["mobile", "crossplatform", "react"],
+    "aliases": [],
+    "meta": { "official_url": "https://reactnative.dev" },
+    "popularity": 86.0
+  },
+  {
+    "id": "flutter",
+    "name": "Flutter",
+    "slug": "flutter",
+    "short_desc": "Google's UI toolkit for mobile, web, and desktop",
+    "categories": ["mobile"],
+    "tags": ["mobile", "crossplatform", "dart"],
+    "aliases": [],
+    "meta": { "official_url": "https://flutter.dev" },
+    "popularity": 85.0
+  },
+  {
+    "id": "jest",
+    "name": "Jest",
+    "slug": "jest",
+    "short_desc": "JavaScript testing framework by Meta",
+    "categories": ["testing"],
+    "tags": ["testing", "javascript", "unittest"],
+    "aliases": [],
+    "meta": { "official_url": "https://jestjs.io" },
+    "popularity": 87.0
+  },
+  {
+    "id": "pytest",
+    "name": "Pytest",
+    "slug": "pytest",
+    "short_desc": "Python testing framework",
+    "categories": ["testing"],
+    "tags": ["testing", "python", "unittest"],
+    "aliases": [],
+    "meta": { "official_url": "https://pytest.org" },
+    "popularity": 88.0
+  },
+  {
+    "id": "cypress",
+    "name": "Cypress",
+    "slug": "cypress",
+    "short_desc": "End-to-end testing framework for web",
+    "categories": ["testing"],
+    "tags": ["testing", "e2e", "javascript"],
+    "aliases": [],
+    "meta": { "official_url": "https://www.cypress.io" },
+    "popularity": 83.0
   }
 ]
-
