@@ -100,7 +100,9 @@ export default function OptionSelector({
             setTimeout(() => setShowSuggestions(false), 150);
           }}
           placeholder={placeholder}
-          className="w-full pl-10 pr-10 py-3 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-100 placeholder:text-slate-500"
+          aria-autocomplete="list"
+          aria-expanded={showSuggestions}
+          className="w-full pl-10 pr-10 py-3 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-100 placeholder:text-slate-500 shadow-sm"
         />
         {value && (
           <button
@@ -118,19 +120,25 @@ export default function OptionSelector({
       </div>
 
       <AnimatePresence>
-        {showSuggestions && suggestions.length > 0 && (
+        {showSuggestions && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="absolute z-10 w-full mt-2 bg-slate-900 border border-slate-800 rounded-lg shadow-lg max-h-60 overflow-y-auto"
+            role="listbox"
+            className="absolute z-10 w-full mt-2 bg-slate-900 border border-slate-800 rounded-lg shadow-lg max-h-64 overflow-y-auto"
           >
-            {loading ? (
+            {loading && (
               <div className="p-3 text-sm text-slate-400">Loading...</div>
-            ) : (
+            )}
+            {!loading && suggestions.length === 0 && (
+              <div className="p-3 text-sm text-slate-400">No results</div>
+            )}
+            {!loading && suggestions.length > 0 && (
               suggestions.map((tech) => (
                 <button
                   key={tech.id}
+                  role="option"
                   onMouseDown={(e) => {
                     e.preventDefault();
                     handleSelect(tech);

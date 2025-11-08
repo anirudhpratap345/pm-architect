@@ -7,15 +7,7 @@ PRODUCTION MODE: Set GEMINI_API_KEY in environment to enable real Gemini API cal
 """
 
 import json
-import os
 from typing import Optional
-from pathlib import Path
-from dotenv import load_dotenv
-
-# Load environment variables from .env.local or .env
-project_root = Path(__file__).parent.parent.parent.parent
-load_dotenv(project_root / ".env.local")
-load_dotenv(project_root / ".env")
 
 # Optional: import Gemini SDK if available
 try:
@@ -24,12 +16,14 @@ try:
 except ImportError:
     GENAI_AVAILABLE = False
 
+from ..config import settings
+
 
 def call_gemini(
     system_prompt: str,
     user_prompt: str,
     max_tokens: int = 400,
-    model: str = "gemini-2.0-flash-exp"
+    model: Optional[str] = None
 ) -> str:
     """
     Call Gemini API to generate structured comparison output.
@@ -38,12 +32,13 @@ def call_gemini(
         system_prompt: System instructions for the LLM
         user_prompt: User query and context
         max_tokens: Maximum response length
-        model: Gemini model name
+        model: Gemini model name (defaults to settings.gemini_model)
     
     Returns:
         JSON string with comparison structure
     """
-    api_key = os.getenv("GEMINI_API_KEY", "")
+    api_key = settings.gemini_api_key
+    model_name = model or settings.gemini_model
     
     # If no API key or genai not available, use dev stub
     if not api_key or not GENAI_AVAILABLE:
@@ -55,7 +50,7 @@ def call_gemini(
         
         # Create model instance
         gemini_model = genai.GenerativeModel(
-            model_name=model,
+            model_name=model_name,
             generation_config={
                 "temperature": 0.3,
                 "max_output_tokens": max_tokens,

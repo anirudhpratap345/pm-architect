@@ -82,19 +82,21 @@ export default function ComparePage() {
   }, [data]);
 
   return (
-    <div className="min-h-screen px-6 py-12 bg-gradient-to-b from-slate-950 to-slate-900 text-gray-100">
-      <h1 className="text-3xl font-semibold mb-8 text-center">Compare Anything</h1>
+    <div className="min-h-screen px-4 sm:px-6 py-10 sm:py-12 bg-gradient-to-b from-slate-950 to-slate-900 text-gray-100">
+      <h1 className="text-3xl sm:text-4xl font-semibold mb-6 sm:mb-8 text-center tracking-tight">Compare Anything</h1>
 
-      <div className="mx-auto max-w-5xl space-y-6">
+      <div className="mx-auto max-w-6xl space-y-6">
         {/* Prompt Box */}
         <PromptBox value={prompt} onChange={setPrompt} />
 
         {/* Categories Bar */}
-        <CategoriesBar
-          categories={categories}
-          selectedCategory={selectedCategory}
-          onSelectCategory={setSelectedCategory}
-        />
+        <div className="pt-2">
+          <CategoriesBar
+            categories={categories}
+            selectedCategory={selectedCategory}
+            onSelectCategory={setSelectedCategory}
+          />
+        </div>
 
         {/* Option Selectors */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -116,7 +118,7 @@ export default function ComparePage() {
         <button
           onClick={handleCompare}
           disabled={loading || !canRun}
-          className="w-full bg-blue-600 hover:bg-blue-700 px-5 py-3 rounded-lg font-medium disabled:opacity-50 transition-all"
+          className="w-full bg-blue-600 hover:bg-blue-700 px-5 py-3 rounded-lg font-medium disabled:opacity-50 transition-all shadow-sm"
         >
           {loading ? "Analyzing…" : "Run Comparison"}
         </button>
@@ -128,12 +130,14 @@ export default function ComparePage() {
           {data ? (
             <div className="space-y-6">
               {/* Show existing ComparisonResult for backward compatibility */}
-              <ComparisonResult rawJson={data} />
+              <div className="rounded-lg border border-slate-800 bg-slate-900/40">
+                <ComparisonResult rawJson={data} />
+              </div>
 
               {/* Enhanced detailed metrics using orchestrator data only */}
               {metricsArray.length > 0 && (
-                <div className="mt-8 bg-slate-900/60 rounded-lg p-6 border border-slate-800">
-                  <div className="flex justify-between items-center mb-6">
+                <div className="mt-6 bg-slate-900/60 rounded-lg p-4 sm:p-6 border border-slate-800">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 sm:mb-6">
                     <h2 className="text-xl font-semibold text-slate-200">
                       Detailed Metrics
                     </h2>
@@ -149,7 +153,7 @@ export default function ComparePage() {
                     </div>
                   </div>
                   
-                  <div className="space-y-0">
+                  <div className="divide-y divide-slate-800">
                     {metricsArray.map((metric: any, idx: number) => (
                       <ComparisonMetricRow
                         key={metric.name || idx}

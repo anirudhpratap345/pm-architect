@@ -26,6 +26,11 @@ class Settings(BaseSettings):
     def gemini_api_key(self) -> str:
         return os.getenv("GEMINI_API_KEY", "")
 
+    # ✅ Gemini default model
+    @property
+    def gemini_model(self) -> str:
+        return os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+
     # ✅ Environment name
     @property
     def app_env(self) -> str:

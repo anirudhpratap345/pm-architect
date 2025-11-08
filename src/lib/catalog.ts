@@ -53,7 +53,11 @@ async function getJson<T>(url: string): Promise<T> {
 }
 
 export async function fetchCategories(): Promise<Category[]> {
-  return getJson<Category[]>(`/api/categories`);
+  try {
+    return await getJson<Category[]>(`/api/categories`);
+  } catch {
+    return [];
+  }
 }
 
 export async function fetchTechs(params?: {
@@ -66,18 +70,30 @@ export async function fetchTechs(params?: {
   if (params?.search) qs.set('search', params.search);
   if (params?.limit) qs.set('limit', String(params.limit));
   const suffix = qs.toString() ? `?${qs.toString()}` : '';
-  return getJson<Tech[]>(`/api/techs${suffix}`);
+  try {
+    return await getJson<Tech[]>(`/api/techs${suffix}`);
+  } catch {
+    return [];
+  }
 }
 
 export async function fetchTech(techId: string): Promise<Tech> {
-  return getJson<Tech>(`/api/tech/${techId}`);
+  return await getJson<Tech>(`/api/tech/${techId}`);
 }
 
 export async function fetchMetricTemplates(): Promise<MetricTemplate[]> {
-  return getJson<MetricTemplate[]>(`/api/metrics/templates`);
+  try {
+    return await getJson<MetricTemplate[]>(`/api/metrics/templates`);
+  } catch {
+    return [];
+  }
 }
 
 export async function fetchTechMetrics(techId: string): Promise<TechMetricsResponse> {
-  return getJson<TechMetricsResponse>(`/api/tech/${techId}/metrics`);
+  try {
+    return await getJson<TechMetricsResponse>(`/api/tech/${techId}/metrics`);
+  } catch {
+    return { tech_id: techId, metrics: [], last_updated: undefined };
+  }
 }
 

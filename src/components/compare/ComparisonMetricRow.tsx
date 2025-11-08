@@ -30,17 +30,16 @@ export default function ComparisonMetricRow({
   const hasDetails = metric.explanation || metric.A_reason || metric.B_reason;
 
   return (
-    <div className="border-b border-slate-800 py-4">
-      <div className="flex items-start gap-4">
+    <div className="py-4">
+      <div className="grid grid-cols-1 sm:grid-cols-[1fr_280px] gap-4 sm:gap-6">
         {/* Metric Name and Explanation */}
-        <div className="flex-1">
+        <div>
           <div className="text-sm font-medium text-slate-300 mb-2">
             {metric.name}
           </div>
-          
-          {/* General Explanation - Always visible if exists */}
+
           {metric.explanation && (
-            <div className="flex items-start gap-2 p-2 rounded-md bg-slate-800/50 mb-3">
+            <div className="flex items-start gap-2 p-2 rounded-md bg-slate-800/50">
               <Info className="w-4 h-4 text-slate-400 flex-shrink-0 mt-0.5" />
               <div className="flex-1">
                 <div className="text-sm text-slate-200">{metric.explanation}</div>
@@ -73,7 +72,7 @@ export default function ComparisonMetricRow({
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
-                className="space-y-3"
+                className="space-y-3 mt-3"
               >
                 {metric.A_reason && (
                   <div className="bg-slate-900/40 p-3 rounded border-l-2 border-indigo-500">
@@ -97,32 +96,28 @@ export default function ComparisonMetricRow({
         </div>
 
         {/* Scores Side-by-Side */}
-        <div className="flex gap-6">
-          {/* Option A Score */}
-          <div className="w-24 text-center">
+        <div className="grid grid-cols-3 items-center text-center">
+          <div>
             <div className="text-xs text-slate-400 mb-1">{leftName}</div>
-            <div className="text-2xl font-semibold text-slate-100">
-              {metric.A}
-            </div>
+            <div className="text-2xl font-semibold text-slate-100">{metric.A}</div>
           </div>
-
-          {/* Delta */}
-          <div className="w-20 text-center flex items-center justify-center">
-            <div className={`text-sm font-medium ${
-              metric.delta.startsWith('+') ? 'text-green-400' : 
-              metric.delta.startsWith('-') ? 'text-red-400' : 
-              'text-slate-400'
-            }`}>
+          <div>
+            <div className="text-xs text-slate-500 mb-1">Delta</div>
+            <div
+              className={`text-sm font-medium ${
+                (metric.delta || '').toString().startsWith('+')
+                  ? 'text-green-400'
+                  : (metric.delta || '').toString().startsWith('-')
+                  ? 'text-red-400'
+                  : 'text-slate-400'
+              }`}
+            >
               {metric.delta}
             </div>
           </div>
-
-          {/* Option B Score */}
-          <div className="w-24 text-center">
+          <div>
             <div className="text-xs text-slate-400 mb-1">{rightName}</div>
-            <div className="text-2xl font-semibold text-slate-100">
-              {metric.B}
-            </div>
+            <div className="text-2xl font-semibold text-slate-100">{metric.B}</div>
           </div>
         </div>
       </div>

@@ -23,15 +23,15 @@ export default function CategoriesBar({
   return (
     <div className="w-full">
       <label className="block text-sm text-slate-400 mb-2">Categories</label>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => onSelectCategory(null)}
-          className={`text-sm px-4 py-2 rounded-full transition-colors ${
+          className={`text-sm px-4 py-2 rounded-full transition-colors whitespace-nowrap ${
             selectedCategory === null
               ? "bg-indigo-600 text-white"
-              : "bg-slate-800 text-slate-200 hover:bg-slate-700"
+              : "bg-slate-800 text-slate-200 hover:bg-slate-700 border border-slate-700"
           }`}
         >
           All
@@ -42,10 +42,10 @@ export default function CategoriesBar({
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => onSelectCategory(cat.id)}
-            className={`text-sm px-4 py-2 rounded-full transition-colors ${
+            className={`text-sm px-4 py-2 rounded-full transition-colors whitespace-nowrap ${
               selectedCategory === cat.id
                 ? "bg-indigo-600 text-white"
-                : "bg-slate-800 text-slate-200 hover:bg-slate-700"
+                : "bg-slate-800 text-slate-200 hover:bg-slate-700 border border-slate-700"
             }`}
           >
             {cat.label}

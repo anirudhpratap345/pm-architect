@@ -16,6 +16,7 @@ import json
 import time
 import uuid
 import os
+from .config import settings
 
 from .agents.llm_client import call_gemini
 from .data_store import save_decision
@@ -131,8 +132,8 @@ async def compare(request: CompareRequest) -> Dict[str, Any]:
         raw_response = call_gemini(
             system_prompt=SYSTEM_PROMPT,
             user_prompt=user_prompt,
-            max_tokens=500,
-            model="gemini-2.0-flash-exp"
+            max_tokens=700,
+            model=None  # Use default from settings (gemini-2.5-flash)
         )
         
         # Parse JSON response
@@ -216,7 +217,7 @@ async def debug_compare():
     - Returns timing, mode, and example output.
     """
     start = time.time()
-    api_key = os.getenv("GEMINI_API_KEY", "") 
+    api_key = settings.gemini_api_key
     mode = "real" if api_key else "stub"
     
     system_prompt = "You are an evaluation engine that compares two technologies concisely in JSON."
@@ -241,6 +242,7 @@ async def debug_compare():
             "duration_sec": duration,
             "example_query": "Redis vs MongoDB",
             "result": parsed_result,
+            "model": settings.gemini_model,
         }
     except Exception as e:
         return {
