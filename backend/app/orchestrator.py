@@ -18,7 +18,7 @@ import uuid
 import os
 from .config import settings
 
-from .agents.llm_client import call_gemini
+from .agents.llm_client import call_gemini, LLMResponse
 from .data_store import save_decision
 
 
@@ -128,13 +128,20 @@ async def compare(request: CompareRequest) -> Dict[str, Any]:
     user_prompt = "\n".join(user_prompt_parts)
     
     # Call Gemini (or dev stub)
+    is_stub_response = False
+    stub_reason = None
+    
     try:
-        raw_response = call_gemini(
+        llm_response: LLMResponse = call_gemini(
             system_prompt=SYSTEM_PROMPT,
             user_prompt=user_prompt,
             max_tokens=700,
             model=None  # Use default from settings (gemini-2.5-flash)
         )
+        
+        is_stub_response = llm_response.is_stub
+        stub_reason = llm_response.error
+        raw_response = llm_response.text
         
         # Parse JSON response
         # Remove markdown code blocks if present
@@ -148,6 +155,8 @@ async def compare(request: CompareRequest) -> Dict[str, Any]:
         
     except json.JSONDecodeError as e:
         # If JSON parsing fails, return a fallback structure
+        is_stub_response = True
+        stub_reason = f"JSON parse error: {str(e)}"
         comparison_data = {
             "left": option_a,
             "right": option_b,
@@ -178,15 +187,20 @@ async def compare(request: CompareRequest) -> Dict[str, Any]:
         "summary": comparison_data.get("summary", ""),
         "confidence": comparison_data.get("confidence", "medium"),
         "evidence": comparison_data.get("evidence", []),
-        "context": request.context or {}
+        "context": request.context or {},
+        # Metadata about response source
+        "source": "stub" if is_stub_response else "gemini",
     }
     
-    # Save to decisions.json (file-based persistence)
-    try:
-        save_decision(response)
-    except Exception as e:
-        # Log but don't fail the request if persistence fails
-        print(f"⚠️  Failed to save decision: {e}")
+    # Only save to decisions.json if this is a REAL API response (not stub data)
+    if not is_stub_response:
+        try:
+            save_decision(response)
+        except Exception as e:
+            # Log but don't fail the request if persistence fails
+            print(f"⚠️  Failed to save decision: {e}")
+    else:
+        print(f"⚠️  Skipping save: stub response ({stub_reason})")
     
     return response
 
@@ -218,7 +232,6 @@ async def debug_compare():
     """
     start = time.time()
     api_key = settings.gemini_api_key
-    mode = "real" if api_key else "stub"
     
     system_prompt = "You are an evaluation engine that compares two technologies concisely in JSON."
     user_prompt = (
@@ -227,27 +240,32 @@ async def debug_compare():
     )
     
     try:
-        response = call_gemini(system_prompt, user_prompt)
+        llm_response: LLMResponse = call_gemini(system_prompt, user_prompt)
         duration = round(time.time() - start, 2)
+        
+        mode = "stub" if llm_response.is_stub else "real"
         
         # Try to parse as JSON, fallback to raw text
         try:
-            parsed_result = json.loads(response) if response.strip().startswith("{") else {"raw_text": response}
+            parsed_result = json.loads(llm_response.text) if llm_response.text.strip().startswith("{") else {"raw_text": llm_response.text}
         except json.JSONDecodeError:
-            parsed_result = {"raw_text": response}
+            parsed_result = {"raw_text": llm_response.text}
         
         return {
             "status": "ok",
             "mode": mode,
+            "is_stub": llm_response.is_stub,
+            "stub_reason": llm_response.error,
             "duration_sec": duration,
             "example_query": "Redis vs MongoDB",
             "result": parsed_result,
             "model": settings.gemini_model,
+            "api_key_configured": bool(api_key),
         }
     except Exception as e:
         return {
             "status": "error", 
             "error": str(e), 
-            "mode": mode,
+            "mode": "unknown",
             "duration_sec": round(time.time() - start, 2)
         }

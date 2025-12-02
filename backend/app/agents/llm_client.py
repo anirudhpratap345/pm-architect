@@ -19,12 +19,20 @@ except ImportError:
 from ..config import settings
 
 
+class LLMResponse:
+    """Response wrapper that tracks whether data is from real API or stub."""
+    def __init__(self, text: str, is_stub: bool = False, error: str = None):
+        self.text = text
+        self.is_stub = is_stub
+        self.error = error
+
+
 def call_gemini(
     system_prompt: str,
     user_prompt: str,
     max_tokens: int = 400,
     model: Optional[str] = None
-) -> str:
+) -> LLMResponse:
     """
     Call Gemini API to generate structured comparison output.
     
@@ -35,14 +43,18 @@ def call_gemini(
         model: Gemini model name (defaults to settings.gemini_model)
     
     Returns:
-        JSON string with comparison structure
+        LLMResponse with text and metadata about source (real API vs stub)
     """
     api_key = settings.gemini_api_key
     model_name = model or settings.gemini_model
     
     # If no API key or genai not available, use dev stub
     if not api_key or not GENAI_AVAILABLE:
-        return _dev_stub(user_prompt)
+        return LLMResponse(
+            text=_dev_stub(user_prompt),
+            is_stub=True,
+            error="No API key configured" if not api_key else "google-generativeai SDK not installed"
+        )
     
     try:
         # Configure Gemini
@@ -63,12 +75,16 @@ def call_gemini(
         # Generate response
         response = gemini_model.generate_content(full_prompt)
         
-        return response.text
+        return LLMResponse(text=response.text, is_stub=False)
         
     except Exception as e:
         # Fallback to dev stub on error
         print(f"⚠️  Gemini API call failed: {e}. Using dev stub.")
-        return _dev_stub(user_prompt)
+        return LLMResponse(
+            text=_dev_stub(user_prompt),
+            is_stub=True,
+            error=str(e)
+        )
 
 
 def _dev_stub(user_prompt: str) -> str:
