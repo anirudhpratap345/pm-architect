@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>PM Architect.ai Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+        }
+        #query {
+            width: 600px;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            margin-right: 10px;
+        }
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            background: #0070f3;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0051cc;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        #output {
+            margin-top: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        #output pre {
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            line-height: 1.6;
+            color: #333;
+        }
+        .loading {
+            color: #666;
+            font-style: italic;
+        }
+        .error {
+            color: #d32f2f;
+            background: #ffebee;
+            padding: 15px;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <h1>PM Architect.ai Test</h1>
+    <p>Test the multi-agent Decision Brief endpoint</p>
+    <input id="query" placeholder="e.g. Firebase vs Supabase for a low-cost bootstrapped MVP with React" />
+    <button onclick="compare()" id="compareBtn">Compare</button>
+    
+    <div id="output"></div>
+    
+    <script>
+        async function compare() {
+            const query = document.getElementById('query').value;
+            const output = document.getElementById('output');
+            const btn = document.getElementById('compareBtn');
+            
+            if (!query.trim()) {
+                output.innerHTML = '<div class="error">Please enter a query</div>';
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.textContent = 'Comparing...';
+            output.innerHTML = '<div class="loading">Generating Decision Brief...</div>';
+            
+            try {
+                const response = await fetch('http://127.0.0.1:8000/api/compare', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ query: query })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                output.innerHTML = '<pre>' + escapeHtml(data.brief) + '</pre>';
+            } catch (error) {
+                output.innerHTML = '<div class="error">Error: ' + escapeHtml(error.message) + '</div>';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Compare';
+            }
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Allow Enter key to submit
+        document.getElementById('query').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                compare();
+            }
+        });
+    </script>
+</body>
+</html>
+
