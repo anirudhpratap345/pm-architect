@@ -22,6 +22,59 @@ load_dotenv(project_root / ".env")
 load_dotenv(project_root / "backend" / ".env.local", override=True)
 load_dotenv(project_root / "backend" / ".env")
 
+# Tech category detection
+TECH_CATEGORIES = {
+    # Web Frameworks & Tools
+    'web_framework': ['next.js', 'remix', 'nuxt', 'sveltekit', 'astro', 'gatsby'],
+    'web_library': ['react', 'vue', 'svelte', 'angular', 'solid'],
+    
+    # Backend & Databases
+    'database': ['postgresql', 'postgres', 'mongodb', 'mysql', 'supabase', 'firebase', 'redis', 'cassandra', 'dynamodb', 'sqlite'],
+    'backend_framework': ['express', 'fastapi', 'django', 'flask', 'spring', 'nestjs', 'rails', 'laravel'],
+    
+    # Programming Languages
+    'language': ['python', 'javascript', 'typescript', 'java', 'scala', 'kotlin', 'go', 'rust', 'elixir', 'erlang', 'c++', 'c#', 'php', 'ruby'],
+    
+    # Infrastructure & DevOps
+    'infrastructure': ['kubernetes', 'k8s', 'docker', 'terraform', 'ansible'],
+    'message_queue': ['kafka', 'rabbitmq', 'nats', 'pulsar'],
+    'cloud_provider': ['aws', 'gcp', 'azure', 'digitalocean', 'linode'],
+    'cloud_service': ['s3', 'cloudfront', 'lambda', 'ec2', 'gcs', 'cloud storage'],
+    
+    # Auth & Payments
+    'auth': ['clerk', 'nextauth', 'auth0', 'supabase auth', 'firebase auth'],
+    'payment': ['stripe', 'paypal', 'square', 'paddle', 'lemon squeezy'],
+    
+    # ML & Data
+    'ml_framework': ['pytorch', 'tensorflow', 'keras', 'scikit-learn', 'xgboost'],
+    'data_tool': ['pandas', 'polars', 'dask', 'spark'],
+    
+    # Frontend Tools
+    'css_framework': ['tailwind', 'bootstrap', 'chakra', 'material-ui', 'ant design', 'mui'],
+    'build_tool': ['vite', 'webpack', 'rollup', 'parcel', 'esbuild'],
+    'graphics': ['three.js', 'babylon.js', 'pixi.js', 'p5.js'],
+    
+    # Hosting & Deployment
+    'hosting': ['vercel', 'netlify', 'railway', 'render', 'fly.io', 'heroku', 'cloudflare pages'],
+    
+    # General
+    'other': []  # Fallback
+}
+
+def detect_tech_category(tech_name: str) -> str:
+    """
+    Detect what category a technology belongs to.
+    Returns category key (e.g., 'database', 'language', 'web_framework')
+    """
+    tech_lower = tech_name.lower()
+    
+    for category, keywords in TECH_CATEGORIES.items():
+        for keyword in keywords:
+            if keyword in tech_lower:
+                return category
+    
+    return 'other'
+
 # Initialize Groq client lazily
 _client = None
 
@@ -92,11 +145,23 @@ Respond with ONLY valid JSON in this exact format (no extra text):
         context.team_size = parsed.get("team_size")
         context.timeline = parsed.get("timeline")
         context.budget = parsed.get("budget")
+        
+        # Detect tech category for both options
+        category_a = detect_tech_category(context.option_a)
+        category_b = detect_tech_category(context.option_b)
+        
+        # Determine primary category (both should be same category)
+        if category_a == category_b:
+            context.tech_category = category_a
+        else:
+            # If different categories, use 'other' as fallback
+            context.tech_category = 'other'
 
     except Exception as e:
         # Fallback values on error to prevent total failure
         context.option_a = "Unknown A"
         context.option_b = "Unknown B"
+        context.tech_category = "other"
         print(f"ContextAgent error: {e}")
 
     return context

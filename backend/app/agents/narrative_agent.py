@@ -5,6 +5,17 @@ from groq import Groq
 from dotenv import load_dotenv
 from pathlib import Path
 
+# Handle imports for value calculator
+try:
+    from ..utils.value_calculator import calculate_value_delivered
+except ImportError:
+    # Fallback for standalone execution
+    import sys
+    backend_path = Path(__file__).resolve().parent.parent.parent
+    if str(backend_path) not in sys.path:
+        sys.path.insert(0, str(backend_path))
+    from app.utils.value_calculator import calculate_value_delivered
+
 # Handle imports for both module and standalone execution
 try:
     from ..models import ComparisonContext
@@ -38,322 +49,298 @@ def get_groq_client():
         groq_client = Groq(api_key=api_key)
     return groq_client
 
-# Flexible snippet templates for common winners — LLM adapts or generates fresh for any tech
-SNIPPET_TEMPLATES = {
-    # Databases
-    "supabase_react": """
-import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+def generate_category_specific_steps(winner: str, category: str, context: ComparisonContext) -> str:
+    """
+    Generate getting started steps based on tech category.
+    No code snippets, just actionable steps.
+    """
+    winner_lower = winner.lower()
+    winner_clean = winner_lower.replace(' ', '-').replace('.', '').replace('js', '')
+    
+    if category == 'database':
+        # Try to construct official docs URL for common databases
+        docs_url = f"https://{winner_lower}.com/docs"
+        if 'postgres' in winner_lower:
+            docs_url = "https://www.postgresql.org/docs/current/tutorial-start.html"
+        elif 'mongodb' in winner_lower:
+            docs_url = "https://www.mongodb.com/docs/manual/tutorial/getting-started/"
+        elif 'supabase' in winner_lower:
+            docs_url = "https://supabase.com/docs/guides/getting-started"
+        elif 'firebase' in winner_lower:
+            docs_url = "https://firebase.google.com/docs/web/setup"
+        elif 'redis' in winner_lower:
+            docs_url = "https://redis.io/docs/getting-started/"
+        
+        return f"""Start right now:
+1. Go to {winner_lower}.com and sign up for free tier (or download installer if self-hosted)
+2. Follow the official quickstart: {docs_url}
+3. Connect from your app using their official client library
+4. Run a test query to verify it works
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+Setup time: 15-30 minutes. Everything's in the docs."""
 
-// Fetch user profile example
-export async function getUserProfile() {
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return null
-  const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single()
-  return data
-}
-""",
+    elif category == 'web_framework':
+        return f"""Start right now:
+1. Run: npx create-{winner_clean}@latest my-app
+2. cd my-app && npm install
+3. npm run dev
+4. Open localhost in browser
+5. Official guide: {winner_lower}.org/docs/getting-started
 
-    "firebase_react": """
-import { initializeApp } from "firebase/app"
-import { getAuth } from "firebase/auth"
-import { getFirestore, doc, getDoc } from "firebase/firestore"
+You'll have a working app in 5 minutes."""
 
-const firebaseConfig = { /* paste your config from console */ }
+    elif category == 'language':
+        return f"""Start right now:
+1. Install {winner}: visit {winner_lower}.org (or official site) and follow installation guide for your OS
+2. Verify: {winner_lower} --version (or equivalent command)
+3. Try the official tutorial from their docs
+4. Write a "Hello World" to test
+5. Pick an IDE: VS Code works for everything
 
-const app = initializeApp(firebaseConfig)
-export const auth = getAuth(app)
-export const db = getFirestore(app)
+Setup time: 20-30 minutes for a working environment."""
 
-// Get user profile example
-export async function getUserProfile() {
-  const user = auth.currentUser
-  if (!user) return null
-  const docSnap = await getDoc(doc(db, "users", user.uid))
-  return docSnap.exists() ? docSnap.data() : null
-}
-""",
+    elif category == 'ml_framework':
+        return f"""Start right now:
+1. Install: pip install {winner_lower}
+2. Verify: python -c "import {winner_lower}; print({winner_lower}.__version__)"
+3. Try official tutorial: {winner_lower}.org/tutorials
+4. Run a simple example (MNIST is standard)
+5. Join their community: Reddit r/{winner_lower} or Discord
 
-    "postgres_node": """
-const { Pool } = require('pg')
+Setup time: 15 minutes. GPU setup takes longer (follow their CUDA guide)."""
 
-const pool = new Pool({
-  user: process.env.PG_USER,
-  host: process.env.PG_HOST,
-  database: process.env.PG_DB,
-  password: process.env.PG_PASSWORD,
-  port: 5432,
-})
+    elif category in ['infrastructure', 'message_queue']:
+        return f"""Start right now:
+1. Local setup: docker run {winner_lower} (easiest for testing)
+2. Or follow official installation: {winner_lower}.io/docs/quickstart
+3. Verify it's running: check the admin UI or CLI
+4. Try a test message/deployment
+5. Production setup: use their cloud offering or self-host guide
 
-// Query example
-async function getUser(id) {
-  const res = await pool.query('SELECT * FROM users WHERE id = $1', [id])
-  return res.rows[0]
-}
-""",
+Local testing: 10 minutes. Production setup: 1-2 hours."""
 
-    # Auth
-    "clerk_nextjs": """
-// app/layout.tsx
-import { ClerkProvider } from '@clerk/nextjs'
+    elif category == 'cloud_service':
+        return f"""Start right now:
+1. Create account: {winner_lower}.amazon.com or equivalent cloud provider
+2. Get API credentials (Access Key + Secret) from the dashboard
+3. Install CLI: follow their official CLI installation guide
+4. Verify: {winner_lower} --version
+5. Try a test operation (upload a file, etc.)
 
-export default function RootLayout({ children }) {
-  return (
-    <ClerkProvider>
-      <html lang="en">
-        <body>
-          {children}
-        </body>
-      </html>
-    </ClerkProvider>
-  )
-}
+Setup time: 15 minutes. Official docs have everything."""
 
-// Protected page example
-import { SignedIn, UserButton } from '@clerk/nextjs'
-<SignedIn>
-  <UserButton />
-</SignedIn>
-""",
+    elif category == 'auth':
+        return f"""Start right now:
+1. Sign up at {winner_lower}.com
+2. Create a new application in their dashboard
+3. Copy your API keys
+4. Install SDK: npm install @{winner_clean}/sdk (or equivalent)
+5. Follow their quickstart: {winner_lower}.com/docs/quickstart
 
-    "nextauth_nextjs": """
-// app/api/auth/[...nextauth]/route.ts
-import NextAuth from "next-auth"
-import GoogleProvider from "next-auth/providers/google"
+You'll have login working in 20 minutes."""
 
-export const authOptions = {
-  providers: [
-    GoogleProvider({
-      clientId: process.env.GOOGLE_ID,
-      clientSecret: process.env.GOOGLE_SECRET,
-    }),
-  ],
-}
+    elif category == 'payment':
+        return f"""Start right now:
+1. Sign up at {winner_lower}.com
+2. Get API keys (test mode for development)
+3. Install SDK for your language
+4. Follow their checkout tutorial
+5. Test with their test card numbers
 
-const handler = NextAuth(authOptions)
-export { handler as GET, handler as POST }
-""",
+Setup time: 30 minutes. Compliance/legal review takes longer."""
 
-    # Hosting/Deployment
-    "railway_deploy": """
-# In your repo root, install CLI if needed: npm i -g @railway/cli
+    elif category == 'css_framework':
+        return f"""Start right now:
+1. Install: npm install {winner_lower}
+2. Add to your config (follow their setup guide)
+3. Import in your main CSS/JS file
+4. Try a test component with their classes
+5. Docs: {winner_lower}.com/docs
 
-# Link and deploy
-railway link  # select your project
-railway up    # deploys current dir
+Working in 5 minutes. Customization takes longer."""
 
-# Set env vars in Railway dashboard
-# Example service config in railway.toml (optional):
-[start]
-cmd = "node app.js"
-""",
+    elif category == 'graphics':
+        return f"""Start right now:
+1. Install: npm install {winner_lower}
+2. Create a canvas element in your HTML
+3. Follow their "Hello World" example
+4. Run and verify you see a 3D scene
+5. Docs: {winner_lower}.org/docs/getting-started
 
-    "render_deploy": """
-# render.yaml example in root
-services:
-  - type: web
-    name: my-app
-    runtime: node
-    buildCommand: npm install
-    startCommand: npm start
-    envVars:
-      - key: NODE_ENV
-        value: production
+Simple scene in 10 minutes. Complex stuff takes practice."""
 
-# Deploy with Git integration or CLI: render deploy
-""",
+    elif category == 'hosting':
+        return f"""Start right now:
+1. Push your code to GitHub
+2. Connect {winner} to your repo
+3. Configure build settings (usually auto-detected)
+4. Deploy (usually one-click)
+5. Get your live URL
 
-    # Payments/Business
-    "stripe_node": """
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
+Deploy time: 5-15 minutes for first deployment."""
 
-// Create checkout session example
-async function createCheckoutSession() {
-  const session = await stripe.checkout.sessions.create({
-    payment_method_types: ['card'],
-    line_items: [{ price: 'price_1ABC123', quantity: 1 }],
-    mode: 'subscription',
-    success_url: 'https://your-site/success',
-    cancel_url: 'https://your-site/cancel',
-  })
-  return session.id
-}
-""",
+    elif category == 'backend_framework':
+        return f"""Start right now:
+1. Install {winner}: pip install {winner_lower} or npm install {winner_lower}
+2. Create a project: {winner_lower} init my-app (or equivalent)
+3. Run dev server
+4. Hit localhost in browser/Postman
+5. Follow official tutorial: {winner_lower}.io/tutorial
 
-    # AWS/GCP
-    "aws_s3_node": """
-const AWS = require('aws-sdk')
-const s3 = new AWS.S3({
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  region: process.env.AWS_REGION,
-})
+"Hello World" API in 10 minutes."""
 
-// Upload file example
-async function uploadFile(fileName, fileContent) {
-  const params = {
-    Bucket: process.env.S3_BUCKET_NAME,
-    Key: fileName,
-    Body: fileContent,
-  }
-  return await s3.upload(params).promise()
-}
-""",
+    else:  # 'other' or unknown
+        return f"""Start right now:
+1. Visit {winner}'s official website
+2. Follow their "Getting Started" or "Quickstart" guide
+3. Check YouTube for "{winner} tutorial" if you prefer visual walkthroughs
+4. Join their community (Discord/Reddit) for help
+5. Official docs: visit their documentation site
 
-    "gcp_storage_node": """
-const { Storage } = require('@google-cloud/storage')
-const storage = new Storage({
-  keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
-  projectId: process.env.GCP_PROJECT_ID,
-})
+Most tools have a quickstart that takes 15-30 minutes."""
 
-// Upload file example
-async function uploadFile(bucketName, fileName, fileContent) {
-  const bucket = storage.bucket(bucketName)
-  const file = bucket.file(fileName)
-  await file.save(fileContent)
-  return file.publicUrl()
-}
-""",
 
-    # UI Frameworks
-    "tailwind_config": """
-// tailwind.config.js
-module.exports = {
-  content: [
-    "./src/**/*.{js,jsx,ts,tsx}",
-  ],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
-}
+def determine_winner(context: ComparisonContext, cost_data: dict, perf_data: dict, risk_data: dict) -> str:
+    """
+    Determines the winner based on user constraints and data.
+    Returns either context.option_a or context.option_b.
+    """
+    constraints_lower = [c.lower() for c in context.constraints]
+    query_lower = context.query.lower()
+    
+    # Cost-focused: pick cheaper option
+    cost_keywords = ["low-cost", "low cost", "cheap", "budget", "bootstrapped", "free", "affordable", "cost-sensitive"]
+    if any(kw in query_lower or any(kw in c for c in constraints_lower) for kw in cost_keywords):
+        cost_a = cost_data.get("year1_tco", {}).get("a", float('inf'))
+        cost_b = cost_data.get("year1_tco", {}).get("b", float('inf'))
+        if isinstance(cost_a, (int, float)) and isinstance(cost_b, (int, float)):
+            return context.option_b if cost_b < cost_a else context.option_a
+    
+    # Performance/scale-focused: pick faster/more scalable option
+    perf_keywords = ["performance", "scale", "scalability", "fast", "speed", "latency", "high-traffic", "high traffic"]
+    if any(kw in query_lower or any(kw in c for c in constraints_lower) for kw in perf_keywords):
+        # Check performance data for winner
+        benchmarks = perf_data.get("benchmarks", {})
+        if benchmarks:
+            # If we have latency data, pick lower latency
+            latency = benchmarks.get("latency_ms", {})
+            if latency:
+                lat_a = latency.get(context.option_a, float('inf'))
+                lat_b = latency.get(context.option_b, float('inf'))
+                if isinstance(lat_a, (int, float)) and isinstance(lat_b, (int, float)):
+                    return context.option_b if lat_b < lat_a else context.option_a
+    
+    # Quick MVP/simplicity-focused: pick option with fewer gotchas
+    mvp_keywords = ["quick", "mvp", "fast", "simple", "easy", "prototype", "rapid"]
+    if any(kw in query_lower or any(kw in c for c in constraints_lower) for kw in mvp_keywords):
+        gotchas_a = len(risk_data.get("gotchas_a", []))
+        gotchas_b = len(risk_data.get("gotchas_b", []))
+        return context.option_b if gotchas_b < gotchas_a else context.option_a
+    
+    # Default: pick option with fewer gotchas
+    gotchas_a = len(risk_data.get("gotchas_a", []))
+    gotchas_b = len(risk_data.get("gotchas_b", []))
+    if gotchas_b < gotchas_a:
+        return context.option_b
+    elif gotchas_a < gotchas_b:
+        return context.option_a
+    
+    # Final fallback: pick option_b (arbitrary but consistent)
+    return context.option_b
 
-// In your CSS file
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-""",
-
-    # General fallback for obscure (e.g., Erlang)
-    "general_python": """
-# Example setup for {winner}
-import some_library  # install via pip if needed
-
-def main():
-  # Simple usage
-  result = some_library.function(param='value')
-  print(result)
-
-if __name__ == "__main__":
-  main()
-""",
-}
 
 async def run(context: ComparisonContext) -> ComparisonContext:
     """
-    NarrativeAgent: Synthesizes everything into the final Decision Brief.
+    NarrativeAgent: Synthesizes everything into a conversational Decision Brief.
     Primary: Gemini 1.5 Flash for conversational voice.
     Fallback: Groq Llama 3.3 70B if Gemini rate-limited.
     """
-    data = context.model_dump()
-
-    # Extract cost data for prompt
-    cost_a = context.cost_breakdown.get("year1_tco", {}).get("a", "N/A")
-    cost_b = context.cost_breakdown.get("year1_tco", {}).get("b", "N/A")
-    breakeven = context.cost_breakdown.get("breakeven_users", "N/A")
+    # Extract data
+    cost_data = context.cost_breakdown
+    perf_data = context.performance
+    risk_data = context.risks
     
-    # Extract gotchas
-    gotchas_a = context.risks.get("gotchas_a", [])
-    gotchas_b = context.risks.get("gotchas_b", [])
+    # Determine winner
+    winner = determine_winner(context, cost_data, perf_data, risk_data)
     
-    # Extract migration effort
-    migration_a_to_b = context.risks.get("migration_effort", {}).get("a_to_b", "Unknown")
-    migration_b_to_a = context.risks.get("migration_effort", {}).get("b_to_a", "Unknown")
-
-    # Include templates in prompt for LLM reference
-    templates_json = json.dumps(SNIPPET_TEMPLATES, indent=2)
+    # Extract key metrics
+    cost_a = cost_data.get("year1_tco", {}).get("a", 0)
+    cost_b = cost_data.get("year1_tco", {}).get("b", 0)
+    cost_savings = abs(cost_a - cost_b) if isinstance(cost_a, (int, float)) and isinstance(cost_b, (int, float)) else 0
+    cheaper_cost = min(cost_a, cost_b) if isinstance(cost_a, (int, float)) and isinstance(cost_b, (int, float)) else "N/A"
+    expensive_cost = max(cost_a, cost_b) if isinstance(cost_a, (int, float)) and isinstance(cost_b, (int, float)) else "N/A"
+    breakeven = cost_data.get("breakeven_users", "N/A")
     
-    prompt = f"""
-You are a $500/hour technical co-founder who has built, scaled, and failed with dozens of stacks. 
-A founder just asked you: "{context.query}"
+    gotchas_a = risk_data.get("gotchas_a", [])
+    gotchas_b = risk_data.get("gotchas_b", [])
+    gotcha_a = gotchas_a[0] if gotchas_a else "None"
+    gotcha_b = gotchas_b[0] if gotchas_b else "None"
+    
+    migration_a_to_b = risk_data.get("migration_effort", {}).get("a_to_b", "Unknown")
+    migration_b_to_a = risk_data.get("migration_effort", {}).get("b_to_a", "Unknown")
+    
+    # Get war story if available
+    war_stories = perf_data.get("war_stories", [])
+    war_story = war_stories[0] if war_stories else None
+    
+    # Build constraints string
+    constraints_str = ", ".join(context.constraints) if context.constraints else "general use"
+    
+    # Generate category-specific getting started steps
+    getting_started = generate_category_specific_steps(winner, context.tech_category, context)
+    
+    prompt = f"""You are a technical advisor with 15 years of experience helping founders make tech decisions. A founder just asked you: "{context.query}"
 
-You have this structured data from your specialist team:
-{json.dumps(context.model_dump(), indent=2)}
+You've analyzed the data. Now write your recommendation like you're messaging them on Slack.
 
-Available code snippet templates (use as reference, adapt, or generate fresh):
-{templates_json}
+CRITICAL FORMATTING RULES:
+1. NO markdown headers (#, ##, ###) anywhere—write in natural paragraphs
+2. Use "you" language throughout (you said, your situation, you'll save)
+3. Start with: "Pick {winner}. Here's why."
+4. Write in 2-3 sentence paragraphs, not walls of text
+5. Be opinionated—say "{winner} wins" not "both are good"
+6. End with the EXACT getting started steps provided below (don't modify them)
+7. 400-600 words MAXIMUM
 
-Your job: Write a tight, punchy Decision Brief that makes the founder feel like they just got the perfect advice over coffee.
+CONTEXT YOU HAVE:
+- Winner: {winner}
+- Tech Category: {context.tech_category}
+- Their situation: {context.use_case or 'general use'}, {context.team_size or 'unspecified team size'}, {context.budget or 'unspecified budget'}
+- Key constraint: {constraints_str}
+- Cost difference: ${cost_savings:,.0f} saved in Year 1 (if applicable)
+- Cheaper option costs: ${cheaper_cost:,.0f} (if applicable)
+- More expensive option costs: ${expensive_cost:,.0f} (if applicable)
+- Breakeven point: {breakeven} users
 
-Rules:
-- ALWAYS pick ONE clear winner. Never hedge, never say "it depends" or "both are great".
-- Speak directly to "you" — make it deeply personal based on their constraints, use case, team size, budget.
-- Keep total length 400–600 words max.
-- Use real numbers, one short war story if available, and honest trade-offs.
-- End with momentum — they should feel excited to start.
+KEY GOTCHAS:
+- {context.option_a}: {gotcha_a}
+- {context.option_b}: {gotcha_b}
 
-Output EXACTLY this markdown structure:
+MIGRATION EFFORT:
+{migration_a_to_b} to switch from {context.option_a} to {context.option_b}
+{migration_b_to_a} to switch from {context.option_b} to {context.option_a}
 
-# The Verdict
-🎯 Pick [Winner]. 
-You'll [biggest tangible benefit — e.g., save $1,800/year and ship 2 weeks faster]. 
-Only consider the other if [one very specific condition].
+{f"WAR STORY: {war_story}" if war_story else ""}
 
-# Why This Fits You Right Now
-[2 tight paragraphs:
-• Why the winner perfectly matches their situation (reference constraints/use_case/team/budget explicitly).
-• One short, believable war story if available ("I saw a solo founder waste 3 weeks on X's security rules...").
-• Honest but brief trade-off acknowledgment.]
+TONE EXAMPLES (follow these):
 
-# The Money
-💰 Year 1 cost at your scale: Winner ~$[low number] vs Loser ~$[high number]
-├─ You stay cheaper until ~[breakeven] users
-└─ Biggest trap: [one specific cost gotcha from data]
+✅ GOOD:
+"You said bootstrapped MVP. That screams {winner}. You'll save ${cost_savings:,.0f} in Year 1 and ship 3 days faster."
+"The catch? {context.option_a} has better mobile SDKs. But for web? {winner} wins."
+"Here's the money shot: {winner} is FREE until ~8K users."
 
-# Watch Out For
-🚨 Winner risks:
-• [gotcha 1]
-• [gotcha 2]
+❌ BAD:
+"Based on the analysis, {winner} appears to be a suitable choice."
+"Both options have their merits and trade-offs to consider."
+"{winner} provides advantages in cost efficiency scenarios."
 
-🚨 Loser risks:
-• [gotcha 1]
-• [gotcha 2]
+GETTING STARTED SECTION:
+End your brief with this EXACT text (don't modify it):
 
-🎯 My take: [short opinion on which set of risks is uglier in practice]
+{getting_started}
 
-# Start in 15 Minutes
-1. Head to [winner official domain, e.g., supabase.com] and sign up/create project
-2. Grab your keys/config from the dashboard
-3. Copy-paste this exact starter code (tailored to your query):
-
-```tsx
-[CRITICAL: Generate a real, working 8–15 line code snippet for ANY winner.
-- First, check SNIPPET_TEMPLATES for a match (e.g., "supabase_react" if winner=Supabase and stack=React).
-- If match, use and adapt it to user context.
-- If no match (obscure tech like Erlang or non-code like PayPal), generate fresh: config steps, API call, or deploy command.
-- Infer stack: React/Next.js if mentioned, Node/Python if backend, general JS if unspecified.
-- For databases: client init + auth + simple query/insert.
-- For auth: provider setup + protected example.
-- For hosting: deploy CLI commands + config file.
-- For payments: API init + checkout example.
-- Make it complete, idiomatic, runnable — use env vars, no <placeholders>.
-- Handle ANY tech analogy: if Erlang vs Go, give process spawn example in Erlang.]
-
-You'll have core functionality running in 15–20 minutes. I've shipped this pattern many times.
-
-# Escape Hatch
-Winner → Loser: [effort from risks]
-Loser → Winner: [effort from risks]
-
-My take: Start simple with the winner. Regret costs more than migration.
-
-Tone: Confident, direct, slightly edgy, deeply caring — like the co-founder who genuinely wants you to succeed.
-"""
+That's it. Now write the brief. Remember: conversational, opinionated, under 600 words. NO markdown headers."""
 
     try:
         # Use the model from config or default to gemini-1.5-flash-latest
@@ -367,10 +354,43 @@ Tone: Confident, direct, slightly edgy, deeply caring — like the co-founder wh
         completion = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
             messages=[{"role": "user", "content": prompt}],
-            temperature=0.6,
+            temperature=0.7,
             max_tokens=1024
         )
         context.final_brief = completion.choices[0].message.content.strip()
+    
+    # Calculate and append value delivered section
+    value_data = calculate_value_delivered(context, cost_data, perf_data, risk_data)
+    
+    # Format money with comma separator
+    money_str = f"${value_data['money_saved']:,}" if value_data['money_saved'] > 0 else "$0"
+    confidence = value_data['confidence']
+    
+    value_section = f"""
+
+---
+
+⏱️ **This comparison just saved you:**
+• {value_data['time_saved_hours']} hours of research time
+• {money_str} in Year 1 (by picking the right option)
+• {value_data['resources_consulted']['reddit_threads']} Reddit threads you would've read
+• {value_data['resources_consulted']['youtube_videos']} YouTube videos you would've watched
+• {value_data['resources_consulted']['documentation_pages']} documentation pages you would've skimmed
+
+📊 **Confidence Level:** {confidence['level']} ({confidence['score']}/100)
+
+*{confidence['explanation']}*
+
+Based on:
+{chr(10).join(f"• {factor}" for factor in confidence['factors'])}
+
+🚀 **Time to decision:** {value_data['completion_time_seconds']} seconds (vs {value_data['time_saved_hours']} hours manually)
+
+---
+
+💬 **Want another comparison this clear?** Try comparing something else!"""
+    
+    context.final_brief += value_section
 
     return context
 
@@ -378,9 +398,10 @@ Tone: Confident, direct, slightly edgy, deeply caring — like the co-founder wh
 if __name__ == "__main__":
     import asyncio
     async def test():
-        ctx = ComparisonContext(query="test")
+        ctx = ComparisonContext(query="Firebase vs Supabase for a low-cost bootstrapped MVP with React")
         ctx.option_a = "Firebase"
         ctx.option_b = "Supabase"
+        ctx.tech_category = "database"  # Will be set by context_agent in real usage
         ctx.constraints = ["low cost", "bootstrapped"]
         ctx.use_case = "SaaS MVP"
         ctx.cost_breakdown = {"year1_tco": {"a": 1140, "b": 300}, "breakeven_users": 40000}
