@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     cors_origins: List[str] = [
         "https://pm-architect-ai.vercel.app",  # Production frontend (Vercel)
         "http://localhost:3000",               # Local dev frontend
+        "http://localhost:3001",               # Local dev frontend (alternate port)
     ]
 
     # ✅ Gemini API Key - loaded from .env.local
