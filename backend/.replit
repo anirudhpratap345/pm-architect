@@ -1,0 +1,11 @@
+# Replit configuration for PM Architect Backend
+
+# Run command - installs dependencies and starts FastAPI server
+run = ["sh", "-c", "pip install -r requirements.txt && uvicorn app.main:app --host 0.0.0.0 --port 8000"]
+
+# Python version
+python = "python3.12"
+
+# Entry point
+entrypoint = "app.main:app"
+

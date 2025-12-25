@@ -20,7 +20,45 @@ class Settings(BaseSettings):
         "https://pm-architect-ai.vercel.app",  # Production frontend (Vercel)
         "http://localhost:3000",               # Local dev frontend
         "http://localhost:3001",               # Local dev frontend (alternate port)
+        # Railway backend domains (add your specific Railway URL after deployment)
+        # Example: "https://your-app.up.railway.app"
     ]
+    
+    # Allow Railway/Replit/Vercel domains dynamically (for production)
+    @property
+    def allowed_origins(self) -> List[str]:
+        """Get CORS origins, including any deployment platform URLs from env"""
+        origins = self.cors_origins.copy()
+        
+        # Railway backend domains
+        railway_url = os.getenv("RAILWAY_PUBLIC_DOMAIN")
+        if railway_url:
+            origins.append(f"https://{railway_url}")
+        
+        # Replit backend domains (no card needed!)
+        # Replit provides REPL_SLUG and REPL_OWNER environment variables
+        repl_slug = os.getenv("REPL_SLUG")
+        repl_owner = os.getenv("REPL_OWNER")
+        if repl_slug and repl_owner:
+            # Allow the specific Replit URL
+            origins.append(f"https://{repl_slug}.{repl_owner}.repl.co")
+        
+        # Also check for explicit Replit URL from env (if set manually)
+        repl_url = os.getenv("REPLIT_URL")
+        if repl_url:
+            origins.append(repl_url)
+        
+        # Vercel preview deployments
+        vercel_url = os.getenv("VERCEL_URL")
+        if vercel_url:
+            origins.append(f"https://{vercel_url}")
+        
+        # PythonAnywhere domains
+        pythonanywhere_user = os.getenv("PYTHONANYWHERE_USER")
+        if pythonanywhere_user:
+            origins.append(f"https://{pythonanywhere_user}.pythonanywhere.com")
+        
+        return origins
 
     # ✅ Gemini API Key - loaded from .env.local
     @property
